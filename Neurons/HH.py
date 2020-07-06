@@ -2,27 +2,30 @@ import numpy as np
 import math 
 import matplotlib.pyplot as plt
 
+# constants http://www.math.pitt.edu/~bdoiron/assets/ermentrout-and-terman-ch-1.pdf
+# paper https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1392413/pdf/jphysiol01442-0106.pdf
+
 # Gate n 
-alpha_n = lambda V: 0.01 * (V + 10) / (math.exp((V + 10) * 0.1) - 1)
-beta_n  = lambda V: 0.125 * math.exp(V/80)
+alpha_n = lambda V: 0.01 * (V + 55) / (1 - np.exp(-(V + 55) * 0.1) )
+beta_n  = lambda V: 0.125 * np.exp(-(V + 65)/80)
 inf_n   = lambda V: alpha_n(V)/(alpha_n(V) + beta_n(V))
 
 # Gate m 
-alpha_m = lambda V: 0.1*(V + 25)/(math.exp((V + 25)*0.1)-1)
-beta_m  = lambda V: 4*math.exp(V/18)
+alpha_m = lambda V: 0.1*(V + 40)/(1- np.exp(-(V + 40)*0.1))
+beta_m  = lambda V: 4*np.exp(-(V+65)/18)
 inf_m   = lambda V: alpha_m(V)/(alpha_m(V) + beta_m(V)) 
 
 # Gate h 
-alpha_h = lambda V: 0.07*math.exp(V/20)
-beta_h  = lambda V: 1/(math.exp((V + 30) * 0.1) +1)
+alpha_h = lambda V: 0.07*math.exp(-(V+65)/20)
+beta_h  = lambda V: 1/(math.exp(-(V + 35) * 0.1) + 1)
 inf_h   = lambda V: alpha_h(V)/(alpha_h(V) + beta_h(V))
 
 
 # Constants 
 Cm      =   1.0         # uF/cm^2 
-VNa     =   -115        # mV
-VK      =   12          # mV
-Vl      =   -10.613     # mV
+VNa     =   50          # mV
+VK      =   -77         # mV
+Vl      =   -54.4       # mV
 gNa     =   120         # m.mho/cm^2
 gK      =   36          # m.mho/cm^2 
 gl      =   0.3         # m.mho/cm^2
@@ -74,7 +77,7 @@ if __name__ == '__main__':
 
     # Select time of iteraction 
     time = 100      # ms 
-    dt   = 0.05      # ms
+    dt   = 0.01      # ms
 
     # Select time of stimulation 
     steps = math.ceil(time / dt)
@@ -85,7 +88,7 @@ if __name__ == '__main__':
     v = neuron.stimulate(I, time, dt)
 
     # Plot
-    vTime = np.arange(0,time,0.05, dtype = float)
+    vTime = np.arange(0,time,dt, dtype = float)
     plt.plot(vTime, v, color = 'r')
     plt.plot(vTime, I, color = 'b')
     plt.title('Hodgkin Huxel Model')
