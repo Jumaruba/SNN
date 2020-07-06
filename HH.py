@@ -1,77 +1,95 @@
-import math
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 
+# Gate n
+alpha_n = lambda V: 0.01 * (V + 10) / (math.exp((V + 10) * 0.1) - 1)
+beta_n = lambda V: 0.125 * math.exp(V / 80)
+inf_n = lambda V: alpha_n(V) / (alpha_n(V) + beta_n(V))
 
-def alpha_n(v):
-    return 0.01 * (v + 10) / (math.exp((v + 10) / 10) - 1)
+# Gate m
+alpha_m = lambda V: 0.1 * (V + 25) / (math.exp((V + 25) * 0.1) - 1)
+beta_m = lambda V: 4 * math.exp(V / 18)
+inf_m = lambda V: alpha_m(V) / (alpha_m(V) + beta_m(V))
+
+# Gate h
+alpha_h = lambda V: 0.07 * math.exp(V / 20)
+beta_h = lambda V: 1 / (math.exp((V + 30) * 0.1) + 1)
+inf_h = lambda V: alpha_h(V) / (alpha_h(V) + beta_h(V))
+
+# Constants
+Cm = 1.0  # uF/cm^2
+VNa = -115  # mV
+VK = 12  # mV
+Vl = -10.613  # mV
+gNa = 120  # m.mho/cm^2
+gK = 36  # m.mho/cm^2
+gl = 0.3  # m.mho/cm^2
+restV = -65  # mV
+
+# Init channels
+n = inf_n(restV)
+m = inf_m(restV)
+h = inf_h(restV)
 
 
-def beta_n(v):
-    return 0.125 * math.exp(v / 80)
-
-
-def alpha_m(v):
-    return 0.1 * (v + 25) / (math.exp((v + 25) / 10) - 1)
-
-
-def beta_m(v):
-    return 4 * math.exp(v / 18)
-
-
-def alpha_h(v):
-    return 0.07 * math.exp(v / 20)
-
-
-def beta_h(v):
-    return 1 / (math.exp((v + 30) / 10) + 1)
-
-
-class Neuron:
+class HH_Neuron:
     def __init__(self):
-        self.CM = 1  # membrane capacitance
-        self.VNa = -115
-        self.VK = 12
-        self.VL = -10613
-        self.GNa = 120  # sodium conductance
-        self.GK = 36  # potassium conductance
-        self.GL = 0.3  # leak conductance
-        self.n = 0
-        self.m = 0
-        self.h = 0
+        self.n = n
+        self.m = m
+        self.h = h
 
-        self.time = 1000
-        self.dt = 0.5  # in ms
-        self.steps = math.ceil(1000 / 0.5)
+    def stimulate(self, I, time, dt):
+        steps = math.ceil(time / dt)
+        v = np.zeros(steps)
+        v[0] = restV
 
-        self.v = np.zeros(self.steps, dtype=float)
+        for t in range(steps - 1):
+            # Conductances
+            NaCond = self.m ** 3 * self.h * gNa
+            KCond = self.n ** 4 * gK
+            gCond = gl
 
-    def step(self, t):
-        self.n += alpha_n(self.v[t]) * (1 - self.n) - beta_n(self.v[t]) * self.n
-        self.m += alpha_m(self.v[t]) * (1 - self.m) - beta_m(self.v[t]) * self.m
-        self.h += alpha_h(self.v[t]) * (1 - self.h) - beta_h(self.v[t]) * self.h
+            # Corrent
+            INa = NaCond * (v[t] - VNa)
+            IK = KCond * (v[t] - VK)
+            Il = gCond * (v[t] - Vl)
 
-        dv = -1 / self.CM * (
-                self.GK * self.n ** 4 * (self.v[t] - self.VK) + self.GNa * self.m ** 3 * self.h * (
-                self.v[t] - self.VNa) + self.GL * (
-                        self.v[t] - self.VL))
+            # Update membrane voltage
+            dv = (I[t] - INa - IK - Il) * dt / Cm
+            v[t + 1] = v[t] + dv
 
-        self.v[t + 1] += dv
+            # Update Channels
+            self.n += (alpha_n(v[t]) * (1 - self.n) - beta_n(v[t]) * self.n) * dt
+            self.m += (alpha_m(v[t]) * (1 - self.m) - beta_m(v[t]) * self.m) * dt
+            self.h += (alpha_h(v[t]) * (1 - self.h) - beta_h(v[t]) * self.h) * dt
 
-    def stimulation(self):
-        for t in range(self.steps - 1):
-            self.step(t)
-
-    def plot(self):
-        vTime = np.arange(0, 1000, 0.5, dtype=None)
-        plt.plot(vTime, self.v, color='b')
-        plt.title("Single neuron stimulation")
-        plt.xlabel("Time [ms]")
-        plt.ylabel("Voltage [mv]")
-        plt.show()
+        return v
 
 
 if __name__ == '__main__':
-    neuron = Neuron()
-    neuron.stimulation()
-    neuron.plot()
+    # Init neuron
+    neuron = HH_Neuron()
+
+    # Select time of iteraction
+    time = 100  # ms
+    dt = 0.5  # ms
+
+    # Select time of stimulation
+    steps = math.ceil(time / dt)
+    I = np.zeros(steps)
+    I[1 * math.ceil(steps / 4):3 * math.ceil(steps / 4)] = 10
+
+    # Run
+    v = neuron.stimulate(I, time, dt)
+
+    # Plot
+    vTime = np.arange(0, steps, 0.5, dtype=float)
+    plt.plot(vTime, v, color='r')
+    plt.plot(vTime, I, color='b')
+    plt.title('Hodgkin Huxel Model')
+    plt.xlabel("Time [ms]")
+    plt.ylabel("Time [mV]")
+    plt.show()
+
+
