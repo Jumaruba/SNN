@@ -26,9 +26,9 @@ Cm      =   1.0         # uF/cm^2
 VNa     =   50          # mV
 VK      =   -77         # mV
 Vl      =   -54.4       # mV
-gNa     =   120         # m.mho/cm^2
-gK      =   36          # m.mho/cm^2 
-gl      =   0.3         # m.mho/cm^2
+gNa     =   120         # ms/cm^2
+gK      =   36          # ms/cm^2 
+gl      =   0.3         # ms/cm^2
 restV   =   -65         # mV
 
 # Init channels 
