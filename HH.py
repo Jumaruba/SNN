@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     # Select time of iteraction 
     time = 100      # ms 
-    dt   = 0.5      # ms 
+    dt   = 0.05      # ms
 
     # Select time of stimulation 
     steps = math.ceil(time / dt)
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     v = neuron.stimulate(I, time, dt)
 
     # Plot
-    vTime = np.arange(0,steps,0.5, dtype = float)
+    vTime = np.arange(0,time,0.05, dtype = float)
     plt.plot(vTime, v, color = 'r')
     plt.plot(vTime, I, color = 'b')
     plt.title('Hodgkin Huxel Model')
