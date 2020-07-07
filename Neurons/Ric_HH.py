@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 class Neuron:
     def __init__(self):
         self.tmax = 1000
-        self.dt = 0.5
+        self.dt = 0.1
         self.steps = math.ceil(self.tmax / self.dt)
         self.i = 10
+        self.inf = 10000000000.0
 
         # setting constants
         self.Cm = 1.0
@@ -33,7 +34,7 @@ class Neuron:
 
     def stimulation(self):
         
-        n,m,h = 1.0,1.0,1.0
+        n,m,h = self.inf,self.inf,self.inf
         for t in range(1, self.steps):
                 
             K = self.Gk * n**4 * (self.v[t-1] - self.Vk)
@@ -52,7 +53,7 @@ class Neuron:
             h += dh
 
     def plot(self):
-        vTime = np.arange(0, 1000, 0.5, dtype=None)
+        vTime = np.arange(0, 1000, 0.1, dtype=None)
         plt.plot(vTime, self.v, color='b')
         plt.title("HH")
         plt.xlabel("Time [ms]")
