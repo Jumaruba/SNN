@@ -17,7 +17,7 @@ This is a [code](Neurons/HH.py) for a single neuron.
 
 ## LIF
 
-![](https://imgur.com/vh4uGSQ)
+![](https://i.imgur.com/vh4uGSQ.png)
 
 ## References: 
 
