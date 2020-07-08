@@ -28,6 +28,7 @@ This is a [code](Neurons/Ric_LIF.py) for a single neuron.
 http://worldcomp-proceedings.com/proc/p2013/BIC3207.pdf  
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1392413/pdf/jphysiol01442-0106.pdf  
 http://www.math.mcgill.ca/gantumur/docs/reps/RyanSicilianoHH.pdf    
-http://www.math.pitt.edu/~bdoiron/assets/ermentrout-and-terman-ch-1.pdf  
+http://www.math.pitt.edu/~bdoiron/assets/ermentrout-and-terman-ch-1.pdf
+https://neuronaldynamics.epfl.ch/online/Ch1.S3.html
 [Izhikevich Paper](https://www.izhikevich.org/publications/spikes.pdf)  
 [Hodgkin Huxel Paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1392413/pdf/jphysiol01442-0106.pdf)   
