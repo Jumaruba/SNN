@@ -17,6 +17,10 @@ This is a [code](Neurons/HH.py) for a single neuron.
 
 ## LIF
 
+The code for this model was developed using this [website](https://neuronaldynamics.epfl.ch/online/Ch1.S3.html), with constants choosed by us.
+
+This is a [code](Neurons/Ric_LIF.py) for a single neuron.
+
 ![](https://i.imgur.com/vh4uGSQ.png)
 
 ## References: 
