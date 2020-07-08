@@ -24,7 +24,7 @@ class Neuron:
 
     def stimulation(self):
         for t in range(self.steps - 1):
-            if self.v[t] >= 30:  # spike
+            if self.v[t] >= -30:  # spike
                 self.v[t + 1] = self.c
                 self.u[t + 1] = self.u[t] + self.d
             else:
