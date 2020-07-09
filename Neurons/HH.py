@@ -1,4 +1,6 @@
-import numpy as np 
+import Neuron
+
+import numpy as np
 import math 
 import matplotlib.pyplot as plt
 
@@ -36,7 +38,8 @@ n = inf_n(restV)
 m = inf_m(restV)
 h = inf_h(restV) 
 
-class HH_Neuron:
+
+class HH_Neuron(Neuron):
     def __init__(self): 
         self.n = n
         self.m = m 
@@ -95,5 +98,3 @@ if __name__ == '__main__':
     plt.xlabel("Time [ms]")
     plt.ylabel("Time [mV]")
     plt.show() 
-
-        

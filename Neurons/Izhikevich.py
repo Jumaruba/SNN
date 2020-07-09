@@ -1,9 +1,11 @@
+import Neuron
+
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Neuron:
+class Izh(Neuron):
     def __init__(self):
         # setting parameters with the default value
         self.a = .1             # fast spiking
@@ -30,6 +32,16 @@ class Neuron:
                 u[t + 1] = u[t] + du
                 v[t + 1] = v[t] + dv
         return v
+
+    def set_constants(self, a="", b="", c="", d=""):
+        if a != "":
+            self.a = a
+        if b != "":
+            self.b = b
+        if c != "":
+            self.c = c
+        if d != "":
+            self.d = d
 
 
 def plot(time, dt, v, I):
