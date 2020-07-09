@@ -1,4 +1,6 @@
-import numpy as np 
+
+
+import numpy as np
 import math 
 import matplotlib.pyplot as plt
 
@@ -20,6 +22,7 @@ alpha_h = lambda V: 0.07*math.exp(-(V+65)/20)
 beta_h  = lambda V: 1/(math.exp(-(V + 35) * 0.1) + 1)
 inf_h   = lambda V: alpha_h(V)/(alpha_h(V) + beta_h(V))
 
+
 # Constants 
 Cm      =   1.0         # uF/cm^2 
 VNa     =   50          # mV
@@ -35,14 +38,15 @@ n = inf_n(restV)
 m = inf_m(restV)
 h = inf_h(restV) 
 
-class HH_Neuron:
+
+class HH_Neuron():
     def __init__(self): 
         self.n = n
         self.m = m 
         self.h = h 
         
-    def stimulate(self, I, time, dt): 
-        steps = math.ceil(time/dt) 
+    def stimulation(self, tmax, I, dt):
+        steps = math.ceil(time/dt)
         v = np.zeros(steps)
         v[0] = restV 
 
@@ -58,40 +62,38 @@ class HH_Neuron:
             Il  = gCond *(v[t]-Vl)
 
             # Update membrane voltage 
-            dv1 = (I[t] - INa - IK - Il)*dt/Cm
-            dv2 = ((I[t] - INa - IK - Il)/Cm + dv1*0.5)*dt 
-            dv3 = ((I[t] - INa - IK - Il)/Cm + dv2*0.5)*dt 
-            dv4 = ((I[t] - INa - IK - Il)/Cm + dv3)*dt 
-            dv = dv1/6 + dv2/3 + dv3/3 + dv4/6  
+            dv1 = (I[t] - INa - IK - Il)/Cm * dt 
+            dv2 = (I[t] - INa - IK - Il + dv1*0.5)/Cm * dt 
+            dv3 = (I[t] - INa - IK - Il + dv2*0.5)/Cm * dt 
+            dv4 = (I[t] - INa - IK - Il + dv3)/Cm * dt 
+            dv  = 1/6*(dv1 + dv2*2 + dv3*2 + dv4) 
             v[t+1] = v[t] + dv
 
-            # Update Channels ------------------------
-
-            # Update n Channel
-            dn1 = dt*(alpha_n(v[t+1])*(1-n)-beta_n(v[t+1])*n)
-            dn2 = dt*(alpha_n(v[t+1])*(1-n + dn1*0.5)-beta_n(v[t+1])*(n+dn1*0.5))
-            dn3 = dt*(alpha_n(v[t+1])*(1-n + dn2*0.5)-beta_n(v[t+1])*(n+dn2*0.5))
-            dn4 = dt*(alpha_n(v[t+1])*(1-n + dn3)-beta_n(v[t+1])*(n+dn3))
-            dn  = dn1/6 + dn2/3 + dn3/3 + dn4/6 
+            # Update Channels
+            # Update Channel n 
+            dn1 = (alpha_n(v[t])*(1-self.n)-beta_n(v[t])*self.n)*dt
+            dn2 = (alpha_n(v[t])*(1-self.n + dn1*0.5)-beta_n(v[t])*(self.n+dn1*0.5))*dt
+            dn3 = (alpha_n(v[t])*(1-self.n + dn2*0.5)-beta_n(v[t])*(self.n+dn2*0.5))*dt
+            dn4 = (alpha_n(v[t])*(1-self.n + dn3)-beta_n(v[t])*(self.n+dn3))*dt
+            dn = 1/6*(dn1 + dn2*2 + dn3*2 + dn4) 
             self.n += dn 
 
-            # Update m Channel 
-            dm1 = dt*(alpha_m(v[t+1])*(1-m)-beta_m(v[t+1])*m)
-            dm2 = dt*(alpha_m(v[t+1])*(1-m + dm1*0.5)-beta_m(v[t+1])*(m+dm1*0.5))
-            dm3 = dt*(alpha_m(v[t+1])*(1-m + dm2*0.5)-beta_m(v[t+1])*(m+dm2*0.5))
-            dm4 = dt*(alpha_m(v[t+1])*(1-m + dm3)-beta_m(v[t+1])*(m+dm3))
-            dm  = dm1/6 + dm2/3 + dm3/3 + dm4/6 
+            # Update Channel m 
+            dm1 = (alpha_m(v[t])*(1-self.m)-beta_m(v[t])*self.m)*dt
+            dm2 = (alpha_m(v[t])*(1-self.m + dm1*0.5)-beta_m(v[t])*(self.m + dm1*0.5))*dt
+            dm3 = (alpha_m(v[t])*(1-self.m + dm2*0.5)-beta_m(v[t])*(self.m + dm2*0.5))*dt
+            dm4 = (alpha_m(v[t])*(1-self.m + dm3)-beta_m(v[t])*(self.m + dm3))*dt
+            dm = 1/6*(dm1 + dm2*2 + dm3*2 + dm4) 
             self.m += dm
 
-            # Update h Channel 
-            dh1 = dt*(alpha_h(v[t+1])*(1-h)-beta_h(v[t+1])*h)
-            dh2 = dt*(alpha_h(v[t+1])*(1-h + dh1*0.5)-beta_h(v[t+1])*(h+dh1*0.5))
-            dh3 = dt*(alpha_h(v[t+1])*(1-h + dh2*0.5)-beta_h(v[t+1])*(h+dh2*0.5))
-            dh4 = dt*(alpha_h(v[t+1])*(1-h + dh3)-beta_h(v[t+1])*(h+dh3))
-            dh  = dh1/6 + dh2/3 + dh3/3 + dh4/6 
-            self.h += dh
+            # Update Channel h 
+            dh1 = (alpha_h(v[t])*(1-self.h)-beta_h(v[t])*self.h)*dt
+            dh2 = (alpha_h(v[t])*(1-self.h + dh1*0.5)-beta_h(v[t])*(self.h + dh1*0.5))*dt
+            dh3 = (alpha_h(v[t])*(1-self.h + dh2*0.5)-beta_h(v[t])*(self.h + dh2*0.5))*dt
+            dh4 = (alpha_h(v[t])*(1-self.h + dh3)-beta_h(v[t])*(self.h + dh3))*dt
+            dh = 1/6*(dh1 + dh2*2 + dh3*2 + dh4)
+            self.h += dh 
 
-            print(self.h, self.m, self.n, v[t])
         return v 
 
 
@@ -110,17 +112,13 @@ if __name__ == '__main__':
     I[1*math.ceil(steps / 4):3*math.ceil(steps / 4)] = 10
 
     # Run 
-    v = neuron.stimulate(I, time, dt)
+    v = neuron.stimulation(time, I, dt)
 
     # Plot
-    vTime = np.arange(0,time,dt, dtype = float)
-    plt.plot(vTime, v, color = 'b', label="potential")
-    plt.plot(vTime, I, color = 'r', label="current")
+    vTime = np.arange(0, time, dt, dtype=float)
+    plt.plot(vTime, v, color='r')
+    plt.plot(vTime, I, color='b')
     plt.title('Hodgkin Huxel Model')
-    plt.legend(loc=(0.01, 0.44))
     plt.xlabel("Time [ms]")
-    plt.ylabel("Voltage [mV]")
-    plt.savefig("HH.png")
+    plt.ylabel("Time [mV]")
     plt.show() 
-
-        
