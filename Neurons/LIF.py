@@ -1,43 +1,35 @@
-import Neuron
+import Neurons.Neuron as n
 
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-class LIF(Neuron):
+class LIF(n.Neuron):
     def __init__(self):
-        self.tmax = 100
-        self.dt = 0.5
-        self.steps = math.ceil(self.tmax / self.dt)
 
         # setting constants
+        super().__init__()
         self.R = 5  # this values are "random"
         self.C = 3
         self.I = 10  # for now, it will be constant
         self.uR = -40
         self.thrs = -20
 
-        self.u = np.zeros(self.steps, dtype=float)
-        self.u[0] = -65.0
-        self.time = 0
 
-    def stimulation(self):
-        for t in range(1, self.steps):
-            if self.u[t - 1] >= self.thrs:
-                self.u[t] = self.uR
+    def stimulation(self, tmax, dt):
+        steps = math.ceil(tmax / dt)
+
+        u = np.zeros(steps, dtype=float)
+        u[0] = -65.0
+
+        for t in range(1, steps):
+            if u[t - 1] >= self.thrs:
+                u[t] = self.uR
             else:
-                du = (-self.u[t - 1] + self.R * self.I) * self.dt / (self.R * self.C)
-                self.time += self.dt
-                self.u[t] = self.u[t - 1] + du
-
-    def plot(self):
-        vTime = np.arange(0, self.tmax, self.dt, dtype=None)
-        plt.plot(vTime, self.u, color='b')
-        plt.title("LIF neuron")
-        plt.xlabel("Time [ms]")
-        plt.ylabel("Voltage [mv]")
-        plt.show()
+                du = (-u[t - 1] + self.R * self.I) * dt / (self.R * self.C)
+                u[t] = u[t - 1] + du
+        return u
 
     """
     This function changes the constants associated with the neuron.
@@ -65,7 +57,15 @@ class LIF(Neuron):
             self.dt = dt
 
 
+def plot(u, tmax, dt):
+    vTime = np.arange(0, tmax, dt, dtype=None)
+    plt.plot(vTime, u, color='b')
+    plt.title("LIF neuron")
+    plt.xlabel("Time [ms]")
+    plt.ylabel("Voltage [mv]")
+    plt.show()
+
+
 if __name__ == '__main__':
     n = LIF()
-    n.stimulation()
-    n.plot()
+    plot(n.stimulation(100, 0.5), 100, 0.5)

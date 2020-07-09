@@ -1,19 +1,20 @@
-import Neuron
+import Neurons.Neuron as n
 
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Izh(Neuron):
+class Izh(n.Neuron):
     def __init__(self):
         # setting parameters with the default value
+        super().__init__()
         self.a = .1             # fast spiking
         self.b = .2
         self.c = -65
         self.d = 8
 
-    def stimulation(self, time, I, dt):
+    def stimulation(self, tmax, I, dt):
         steps = math.ceil(time / dt)
 
         # input

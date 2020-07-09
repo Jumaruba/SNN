@@ -1,4 +1,4 @@
-import Neuron
+import Neurons.Neuron as ne
 
 import numpy as np
 import math 
@@ -39,14 +39,15 @@ m = inf_m(restV)
 h = inf_h(restV) 
 
 
-class HH_Neuron(Neuron):
+class HH_Neuron(ne.Neuron):
     def __init__(self): 
+        super().__init__()
         self.n = n
         self.m = m 
         self.h = h 
         
-    def stimulate(self, I, time, dt): 
-        steps = math.ceil(time/dt) 
+    def stimulation(self, tmax, I, dt):
+        steps = math.ceil(time/dt)
         v = np.zeros(steps)
         v[0] = restV 
 
@@ -88,12 +89,12 @@ if __name__ == '__main__':
     I[1*math.ceil(steps / 4):3*math.ceil(steps / 4)] = 10
 
     # Run 
-    v = neuron.stimulate(I, time, dt)
+    v = neuron.stimulate(time, I, dt)
 
     # Plot
-    vTime = np.arange(0,time,dt, dtype = float)
-    plt.plot(vTime, v, color = 'r')
-    plt.plot(vTime, I, color = 'b')
+    vTime = np.arange(0, time, dt, dtype=float)
+    plt.plot(vTime, v, color='r')
+    plt.plot(vTime, I, color='b')
     plt.title('Hodgkin Huxel Model')
     plt.xlabel("Time [ms]")
     plt.ylabel("Time [mV]")

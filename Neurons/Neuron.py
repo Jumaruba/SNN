@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 
 
 class Neuron(ABC):
-    def __init__(self, method):
+    def __init__(self):
         self.method = "el"
 
         super().__init__()
@@ -14,9 +14,5 @@ class Neuron(ABC):
             self.method = "el"
 
     @abstractmethod
-    def plot(self):
-        pass
-
-    @abstractmethod
-    def stimulation(self):
+    def stimulation(self, tmax, I, dt):
         pass
