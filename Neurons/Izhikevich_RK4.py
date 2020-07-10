@@ -1,7 +1,7 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-
+from Neuron import Neuron as Neuron_
 
 def f_v(i, u, v): 
     return (0.04 * v * v + 5 * v + 140 - u + i)
@@ -9,10 +9,10 @@ def f_v(i, u, v):
 def f_u(a,b,v,u): 
     return a * (b * v - u)
 
-class Neuron:
+class Neuron(Neuron_):
     def __init__(self):
         # setting parameters with the default value
-        self.a = .02             # fast spiking
+        self.a = .1             # fast spiking
         self.b = .2
         self.c = -65
         self.d = 8
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     n = Neuron()
 
     time = 500
-    dt = 0.1
+    dt = 0.01
     steps = math.ceil(time / dt)
     I = [0 if 200 / dt <= i <= 300 / dt else 10 for i in range(steps)]
     v = n.stimulation(time, I, dt)

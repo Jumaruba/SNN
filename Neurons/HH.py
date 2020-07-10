@@ -1,4 +1,5 @@
-import Neurons.Neuron as ne
+from Neuron import Neuron as Neuron_
+
 
 import numpy as np
 import math 
@@ -39,7 +40,7 @@ m = inf_m(restV)
 h = inf_h(restV) 
 
 
-class HH_Neuron(ne.Neuron):
+class HH_Neuron(Neuron_):
     def __init__(self): 
         super().__init__()
         self.n = n
@@ -89,7 +90,7 @@ if __name__ == '__main__':
     I[1*math.ceil(steps / 4):3*math.ceil(steps / 4)] = 10
 
     # Run 
-    v = neuron.stimulate(time, I, dt)
+    v = neuron.stimulation(time, I, dt)
 
     # Plot
     vTime = np.arange(0, time, dt, dtype=float)

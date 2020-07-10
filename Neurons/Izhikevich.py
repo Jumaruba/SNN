@@ -1,11 +1,11 @@
-import Neurons.Neuron as n
+from Neuron import Neuron as Neuron_
 
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Izh(n.Neuron):
+class Izh(Neuron_):
     def __init__(self):
         # setting parameters with the default value
         super().__init__()
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     n = Izh()
 
     time = 500
-    dt = 0.1
+    dt = 0.01
     steps = math.ceil(time / dt)
     I = [0 if 200 / dt <= i <= 300 / dt else 10 for i in range(steps)]
     v = n.stimulation(time, I, dt)

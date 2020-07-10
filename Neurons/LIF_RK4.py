@@ -1,9 +1,9 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from Neuron import Neuron as Neuron_
 
-
-class Neuron:
+class Neuron(Neuron_):
     def __init__(self):
         self.tmax = 100
         self.dt = 0.5

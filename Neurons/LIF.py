@@ -1,11 +1,11 @@
-import Neurons.Neuron as n
+from Neuron import Neuron as Neuron_
 
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-class LIF(n.Neuron):
+class LIF(Neuron_):
     def __init__(self):
 
         # setting constants
