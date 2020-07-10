@@ -17,6 +17,25 @@ class Izh_Neuron(Neuron_):
         self.c = -65
         self.d = 8
 
+    def getDv(self, I, u, v, i): 
+        dv1 = f_v(I[i], u[i], v[i])*dt 
+        dv2 = f_v(I[i], u[i], v[i] + dv1*0.5)*dt
+        dv3 = f_v(I[i], u[i], v[i] + dv2*0.5)*dt 
+        dv4 = f_v(I[i], u[i], v[i] + dv3)*dt 
+        dv  = 1/6*(dv1 + dv2*2 + dv3*2 + dv4) 
+
+        return dv 
+
+    def getDu(self, u, v, i): 
+        du1 = f_u(self.a, self.b, v[i], u[i])*dt 
+        du2 = f_u(self.a, self.b, v[i], u[i] + du1*0.5)*dt
+        du3 = f_u(self.a, self.b, v[i], u[i] + du2*0.5)*dt 
+        du4 = f_u(self.a, self.b, v[i], u[i] + du3)*dt 
+        du  = 1/6*(du1 + du2*2 + du3*2 + du4) 
+
+        return du 
+
+
     def stimulation(self, time, I, dt):
         steps = math.ceil(time / dt)
 
@@ -30,21 +49,10 @@ class Izh_Neuron(Neuron_):
             if v[t] >= -30:  # spike
                 v[t + 1] = self.c
                 u[t + 1] = u[t] + self.d
-            else:
-                dv1 = f_v(I[t], u[t], v[t])*dt 
-                dv2 = f_v(I[t], u[t], v[t] + dv1*0.5)*dt
-                dv3 = f_v(I[t], u[t], v[t] + dv2*0.5)*dt 
-                dv4 = f_v(I[t], u[t], v[t] + dv3)*dt 
-                dv  = 1/6*(dv1 + dv2*2 + dv3*2 + dv4) 
+            else: 
+                u[t + 1] = u[t] + self.getDu(u, v, t)
+                v[t + 1] = v[t] + self.getDv(I, u, v, t)
 
-                du1 = f_u(self.a, self.b, v[t], u[t])*dt 
-                du2 = f_u(self.a, self.b, v[t], u[t] + du1*0.5)*dt
-                du3 = f_u(self.a, self.b, v[t], u[t] + du2*0.5)*dt 
-                du4 = f_u(self.a, self.b, v[t], u[t] + du3)*dt 
-                du  = 1/6*(du1 + du2*2 + du3*2 + du4) 
-
-                u[t + 1] = u[t] + du
-                v[t + 1] = v[t] + dv
         return v
 
 

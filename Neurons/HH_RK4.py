@@ -43,38 +43,38 @@ class HH_Neuron(Neuron_):
         self.h = inf_h(self.restV)
         
         
-    def getDv(self, iteration, INa, IK, Il):
-        dv1 = (I[iteration] - INa - IK - Il)/self.Cm * dt 
-        dv2 = (I[iteration] - INa - IK - Il + dv1*0.5)/self.Cm * dt 
-        dv3 = (I[iteration] - INa - IK - Il + dv2*0.5)/self.Cm * dt 
-        dv4 = (I[iteration] - INa - IK - Il + dv3)/self.Cm * dt 
+    def getDv(self, i, INa, IK, Il):
+        dv1 = (I[i] - INa - IK - Il)/self.Cm * dt 
+        dv2 = (I[i] - INa - IK - Il + dv1*0.5)/self.Cm * dt 
+        dv3 = (I[i] - INa - IK - Il + dv2*0.5)/self.Cm * dt 
+        dv4 = (I[i] - INa - IK - Il + dv3)/self.Cm * dt 
         dv  = 1/6*(dv1 + dv2*2 + dv3*2 + dv4) 
         
         return dv 
 
-    def getDn(self, iteration, dt, v): 
-        dn1 = (alpha_n(v[iteration])*(1-self.n)-beta_n(v[iteration])*self.n)*dt
-        dn2 = (alpha_n(v[iteration])*(1-self.n + dn1*0.5)-beta_n(v[iteration])*(self.n+dn1*0.5))*dt
-        dn3 = (alpha_n(v[iteration])*(1-self.n + dn2*0.5)-beta_n(v[iteration])*(self.n+dn2*0.5))*dt
-        dn4 = (alpha_n(v[iteration])*(1-self.n + dn3)-beta_n(v[iteration])*(self.n+dn3))*dt
+    def getDn(self, i, dt, v): 
+        dn1 = (alpha_n(v[i])*(1-self.n)-beta_n(v[i])*self.n)*dt
+        dn2 = (alpha_n(v[i])*(1-self.n + dn1*0.5)-beta_n(v[i])*(self.n+dn1*0.5))*dt
+        dn3 = (alpha_n(v[i])*(1-self.n + dn2*0.5)-beta_n(v[i])*(self.n+dn2*0.5))*dt
+        dn4 = (alpha_n(v[i])*(1-self.n + dn3)-beta_n(v[i])*(self.n+dn3))*dt
         dn = 1/6*(dn1 + dn2*2 + dn3*2 + dn4) 
         
         return dn 
 
-    def getDm(self, iteration, dt, v):
-        dm1 = (alpha_m(v[iteration])*(1-self.m)-beta_m(v[iteration])*self.m)*dt
-        dm2 = (alpha_m(v[iteration])*(1-self.m + dm1*0.5)-beta_m(v[iteration])*(self.m + dm1*0.5))*dt
-        dm3 = (alpha_m(v[iteration])*(1-self.m + dm2*0.5)-beta_m(v[iteration])*(self.m + dm2*0.5))*dt
-        dm4 = (alpha_m(v[iteration])*(1-self.m + dm3)-beta_m(v[iteration])*(self.m + dm3))*dt
+    def getDm(self, i, dt, v):
+        dm1 = (alpha_m(v[i])*(1-self.m)-beta_m(v[i])*self.m)*dt
+        dm2 = (alpha_m(v[i])*(1-self.m + dm1*0.5)-beta_m(v[i])*(self.m + dm1*0.5))*dt
+        dm3 = (alpha_m(v[i])*(1-self.m + dm2*0.5)-beta_m(v[i])*(self.m + dm2*0.5))*dt
+        dm4 = (alpha_m(v[i])*(1-self.m + dm3)-beta_m(v[i])*(self.m + dm3))*dt
         dm = 1/6*(dm1 + dm2*2 + dm3*2 + dm4) 
 
         return dm 
 
-    def getDh(self, iteration, dt, v):
-        dh1 = (alpha_h(v[iteration])*(1-self.h)-beta_h(v[iteration])*self.h)*dt
-        dh2 = (alpha_h(v[iteration])*(1-self.h + dh1*0.5)-beta_h(v[iteration])*(self.h + dh1*0.5))*dt
-        dh3 = (alpha_h(v[iteration])*(1-self.h + dh2*0.5)-beta_h(v[iteration])*(self.h + dh2*0.5))*dt
-        dh4 = (alpha_h(v[iteration])*(1-self.h + dh3)-beta_h(v[iteration])*(self.h + dh3))*dt
+    def getDh(self, i, dt, v):
+        dh1 = (alpha_h(v[i])*(1-self.h)-beta_h(v[i])*self.h)*dt
+        dh2 = (alpha_h(v[i])*(1-self.h + dh1*0.5)-beta_h(v[i])*(self.h + dh1*0.5))*dt
+        dh3 = (alpha_h(v[i])*(1-self.h + dh2*0.5)-beta_h(v[i])*(self.h + dh2*0.5))*dt
+        dh4 = (alpha_h(v[i])*(1-self.h + dh3)-beta_h(v[i])*(self.h + dh3))*dt
         dh = 1/6*(dh1 + dh2*2 + dh3*2 + dh4)
 
         return dh 
