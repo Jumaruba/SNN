@@ -5,6 +5,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+"""
+Constants indication:
+r -> Resistence;   
+c -> Capacitor;     
+i -> Intensity of current;      
+u_r -> value of U after spike;      
+thrs -> value of threshold;     
+initial_u -> initial value of U
+"""
 class LIF(Neuron_):
     def __init__(self):
 
@@ -29,18 +38,6 @@ class LIF(Neuron_):
                 du = (-u[t - 1] + self.R * I) * dt / (self.R * self.C)
                 u[t] = u[t - 1] + du
         return u
-
-    """
-    This function changes the constants associated with the neuron.
-    r -> Resistence;    c -> Capacitor;     i -> Intensity of current;      
-    u_r -> value of U after spike;      thrs -> value of threshold;     initial_u -> initial value of U
-    """
-    def set_time_interval(self, tmax="", dt=""):
-        if tmax != "":
-            self.tmax = tmax
-        if dt != "":
-            self.dt = dt
-
 
 
 # Let the user choose the parameters
