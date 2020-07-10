@@ -46,7 +46,52 @@ class Neuron(Neuron_):
         plt.show()
 
 
+# Let the user choose the parameters
+def changeParameters(neuron): 
+    while(1): 
+        print("--------------------CHOOSE PARAMETER--------------------")
+        print()
+        print("Would you to change any constant?")
+        print()
+        print("{:47}".format("R [Resistence]  (actual = %.2f)" %neuron.R) + "[1]")
+        print("{:47}".format("C [Capacitor]   (actual = %.2f mV)" %neuron.C) + "[2]")
+        print("{:47}".format("i [Current]     (actual = %.2f mV)" %neuron.I) + "[3]")
+        print("{:47}".format("u_r [U after spike] (actual = %.2f mV)" %neuron.uR) + "[4]")
+        print("{:47}".format("thrs [Threshold value] (actual = %.2f mV)" %neuron.thrs) + "[5]")
+        print()
+        print("{:47}".format("Show Graph") + "[6]")
+        print()
+        option = float(input("Option: ")) 
+        if option < 1 or option > 6: 
+            print("Invalid option!")
+        elif option == 6:
+            break 
+        else: 
+            value = float(input("Type the value: "))
+            
+            if option == 1: 
+                neuron.R = value 
+            elif option == 2: 
+                neuron.C = value  
+            elif option == 3: 
+                neuron.I = value 
+            elif option == 4: 
+                neuron.uR = value 
+            elif option == 5: 
+                neuron.thrs = value 
+
+            print()
+
+def plot(u, tmax, dt):
+    vTime = np.arange(0, tmax, dt, dtype=None)
+    plt.plot(vTime, u, color='b')
+    plt.title("LIF neuron")
+    plt.xlabel("Time [ms]")
+    plt.ylabel("Voltage [mv]")
+    plt.show()
+
+
 if __name__ == '__main__':
-    n = Neuron()
-    n.stimulation()
-    n.plot()
+    n = LIF()
+    changeParameters(n)
+    plot(n.stimulation(100, 10, 0.5), 100, 0.5)
