@@ -36,6 +36,32 @@ class Neuron(Neuron_):
                 du = 1/6*(du1 + du2*2 + du3*2 + du4) 
                 self.u[t] = self.u[t - 1] + du
             
+    """
+    This function changes the constants associated with the neuron.
+    r -> Resistence;    c -> Capacitor;     i -> Intensity of current;      
+    u_r -> value of U after spike;      thrs -> value of threshold;     initial_u -> initial value of U
+    """
+
+    def set_constants(self, r="", c="", i="", u_r="", thrs="", initial_u=""):
+        if r != "":
+            self.R = r
+        if c != "":
+            self.C = c
+        if i != "":
+            self.I = i
+        if u_r != "":
+            self.uR = u_r
+        if thrs != "":
+            self.thrs = thrs
+        if initial_u != "":
+            self.u[0] = initial_u
+
+    def set_time_interval(self, tmax="", dt=""):
+        if tmax != "":
+            self.tmax = tmax
+        if dt != "":
+            self.dt = dt
+
 
     def plot(self):
         vTime = np.arange(0, self.tmax, self.dt, dtype=None)

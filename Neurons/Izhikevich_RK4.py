@@ -55,6 +55,15 @@ class Izh_Neuron(Neuron_):
 
         return v
 
+    def set_constants(self, a="", b="", c="", d=""):
+        if a != "":
+            self.a = a
+        if b != "":
+            self.b = b
+        if c != "":
+            self.c = c
+        if d != "":
+            self.d = d
 
 def plot(time, dt, v, I):
     vTime = np.arange(0, time, dt, dtype=None)

@@ -34,6 +34,15 @@ class Izh_Neuron(Neuron_):
                 v[t + 1] = v[t] + dv
         return v
 
+    def set_constants(self, a="", b="", c="", d=""):
+        if a != "":
+            self.a = a
+        if b != "":
+            self.b = b
+        if c != "":
+            self.c = c
+        if d != "":
+            self.d = d
 
 # Let the user choose the parameters
 def changeParameters(neuron): 
