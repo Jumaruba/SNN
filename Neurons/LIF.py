@@ -16,8 +16,7 @@ class LIF(n.Neuron):
         self.uR = -40
         self.thrs = -20
 
-
-    def stimulation(self, tmax, dt):
+    def stimulation(self, tmax, I, dt):
         steps = math.ceil(tmax / dt)
 
         u = np.zeros(steps, dtype=float)
@@ -27,7 +26,7 @@ class LIF(n.Neuron):
             if u[t - 1] >= self.thrs:
                 u[t] = self.uR
             else:
-                du = (-u[t - 1] + self.R * self.I) * dt / (self.R * self.C)
+                du = (-u[t - 1] + self.R * I) * dt / (self.R * self.C)
                 u[t] = u[t - 1] + du
         return u
 
@@ -36,6 +35,7 @@ class LIF(n.Neuron):
     r -> Resistence;    c -> Capacitor;     i -> Intensity of current;      
     u_r -> value of U after spike;      thrs -> value of threshold;     initial_u -> initial value of U
     """
+
     def set_constants(self, r="", c="", i="", u_r="", thrs="", initial_u=""):
         if r != "":
             self.R = r
@@ -68,4 +68,4 @@ def plot(u, tmax, dt):
 
 if __name__ == '__main__':
     n = LIF()
-    plot(n.stimulation(100, 0.5), 100, 0.5)
+    plot(n.stimulation(100, 10, 0.5), 100, 0.5)

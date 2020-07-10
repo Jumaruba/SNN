@@ -7,7 +7,7 @@ class Neuron(ABC):
 
         super().__init__()
 
-    def changeMethod(self, method):
+    def change_method(self, method):
         if method == "rk":
             self.method = "rk"
         else:

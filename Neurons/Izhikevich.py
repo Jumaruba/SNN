@@ -57,7 +57,7 @@ def plot(time, dt, v, I):
 
 
 if __name__ == '__main__':
-    n = Neuron()
+    n = Izh()
 
     time = 500
     dt = 0.1

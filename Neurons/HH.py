@@ -71,7 +71,7 @@ class HH_Neuron(ne.Neuron):
             self.m += (alpha_m(v[t])*(1-self.m)-beta_m(v[t])*self.m)*dt
             self.h += (alpha_h(v[t])*(1-self.h)-beta_h(v[t])*self.h)*dt
 
-        return v 
+        return v
 
 
 if __name__ == '__main__': 
