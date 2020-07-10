@@ -99,7 +99,6 @@ def changeParameters(neuron):
                 neuron.d = value 
  
 
-            print("The new value is", value) 
             print()
 
 def plot(time, dt, v, I):

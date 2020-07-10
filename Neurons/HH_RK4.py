@@ -150,7 +150,6 @@ def changeParameters(neuron):
             elif option == 8: 
                 neuron.restV = value  
 
-            print("The new value is", value) 
             print()
 
 
