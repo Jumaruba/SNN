@@ -9,7 +9,7 @@ def f_v(i, u, v):
 def f_u(a,b,v,u): 
     return a * (b * v - u)
 
-class Neuron(Neuron_):
+class Izh_Neuron(Neuron_):
     def __init__(self):
         # setting parameters with the default value
         self.a = .1             # fast spiking
@@ -59,8 +59,55 @@ def plot(time, dt, v, I):
     plt.show()
 
 
+# Let the user choose the parameters
+def changeParameters(neuron): 
+    while(1): 
+        print("--------------------CHOOSE PARAMETER--------------------")
+        print()
+        print("Would you to change any constant?")
+        print()
+        print("{:47}".format("a  (actual = %.2f)" %neuron.a) + "[1]")
+        print("{:47}".format("b  (actual = %.2f mV)" %neuron.b) + "[2]")
+        print("{:47}".format("c  (actual = %.2f mV)" %neuron.c) + "[3]")
+        print("{:47}".format("d  (actual = %.2f mV)" %neuron.d) + "[4]")
+        print()
+        print("{:47}".format("Show Graph") + "[5]")
+        print()
+        option = float(input("Option: ")) 
+        if option < 1 or option > 5: 
+            print("Invalid option!")
+        elif option == 5:
+            break 
+        else: 
+            value = float(input("Type the value: "))
+            
+            if option == 1: 
+                neuron.a = value 
+            elif option == 2: 
+                neuron.b = value  
+            elif option == 3: 
+                neuron.c = value 
+            elif option == 4: 
+                neuron.d = value 
+ 
+
+            print("The new value is", value) 
+            print()
+
+def plot(time, dt, v, I):
+    vTime = np.arange(0, time, dt, dtype=None)
+    plt.plot(vTime, v, color='b', label = "potential")
+    plt.plot(vTime, I, color='r', label = "current")
+    plt.title("Single neuron stimulation")
+    plt.xlabel("Time [ms]")
+    plt.ylabel("Voltage [mv]")
+    plt.savefig("Fast spiking")
+    plt.show()
+
+
 if __name__ == '__main__':
-    n = Neuron()
+    n = Izh_Neuron()
+    changeParameters(n)
 
     time = 500
     dt = 0.01

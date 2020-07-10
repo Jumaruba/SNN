@@ -103,13 +103,13 @@ def changeParameters(neuron):
         print()
         print("{:47}".format("Show Graph") + "[9]")
         print()
-        option = int(input("Option: ")) 
+        option = float(input("Option: ")) 
         if option < 1 or option > 9: 
             print("Invalid option!")
         elif option == 9:
             break 
         else: 
-            value = int(input("Type the value: "))
+            value = float(input("Type the value: "))
             
             if option == 1: 
                 neuron.Cm = value 
