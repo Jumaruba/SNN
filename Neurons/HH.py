@@ -75,11 +75,52 @@ class HH_Neuron(Neuron_):
         return v
 
 
+def changeParameters(): 
+    array = [0, Cm, VNa, VK, Vl, gNa, gK, gl, restV]
+    while(1): 
+        print("--------------------CHOOSE PARAMETER--------------------")
+        print()
+        print("Would you to change any constant?")
+        print()
+        print("{:47}".format("Cm  (actual = %.2f uF/cm^2)" %array[1]) + "[1]")
+        print("{:47}".format("VNa (actual = %.2f mV)" %array[2]) + "[2]")
+        print("{:47}".format("VK  (actual = %.2f mV)" %array[3]) + "[3]")
+        print("{:47}".format("Vl  (actual = %.2f mV)" %array[4]) + "[4]")
+        print("{:47}".format("gNa (actual = %.2f mV)" %array[5]) + "[5]")
+        print("{:47}".format("gK  (actual = %.2f ms/cm^2)" %array[6]) + "[6]")
+        print("{:47}".format("gl  (actual = %.2f ms/cm^2)" %array[7]) + "[7]")
+        print("{:47}".format("restV (actual = %.2f mV)" %array[8]) + "[8]")
+        print()
+        print("{:47}".format("Show Graph") + "[9]")
+        print()
+        option = int(input("Option: ")) 
+        if option < 1 or option > 9: 
+            print("Invalid option!")
+        elif option == 9:
+            break 
+        else: 
+            value = int(input("Type the value: "))
+            array[option] = value
+            print("The new value is", value) 
+            print()
+
+    return array 
+        
 if __name__ == '__main__': 
+
+    # Attribute value to parameters 
+    array = changeParameters()
+    Cm      =   array[1]
+    VNa     =   array[2]
+    VK      =   array[3]
+    Vl      =   array[4]
+    gNa     =   array[5]
+    gK      =   array[6]
+    gl      =   array[7]
+    restV   =   array[8]
 
     # Init neuron 
     neuron = HH_Neuron()
-
     # Select time of iteraction 
     time = 100      # ms 
     dt   = 0.01      # ms
