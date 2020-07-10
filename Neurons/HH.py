@@ -74,7 +74,7 @@ class HH_Neuron(Neuron_):
 
         return v
 
-
+# Let the user choose the parameters 
 def changeParameters(): 
     array = [0, Cm, VNa, VK, Vl, gNa, gK, gl, restV]
     while(1): 
@@ -139,5 +139,5 @@ if __name__ == '__main__':
     plt.plot(vTime, I, color='b')
     plt.title('Hodgkin Huxel Model')
     plt.xlabel("Time [ms]")
-    plt.ylabel("Time [mV]")
+    plt.ylabel("Voltage [mV]")
     plt.show() 
