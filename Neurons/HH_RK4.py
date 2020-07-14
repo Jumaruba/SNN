@@ -24,7 +24,7 @@ inf_h   = lambda V: alpha_h(V)/(alpha_h(V) + beta_h(V))
 
 
 
-class HH_Neuron(Neuron_):
+class HH_RK4(Neuron_):
     #Constans 
 
     Cm      =   1.0         # uF/cm^2 
@@ -156,7 +156,7 @@ def changeParameters(neuron):
 if __name__ == '__main__': 
 
     # Init neuron 
-    neuron = HH_Neuron()
+    neuron = HH_RK4()
     changeParameters(neuron)
 
     # Select time of iteraction 

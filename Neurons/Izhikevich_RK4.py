@@ -9,13 +9,15 @@ def f_v(i, u, v):
 def f_u(a,b,v,u): 
     return a * (b * v - u)
 
-class Izh_Neuron(Neuron_):
+class Izhi_RK4(Neuron_):
     def __init__(self):
-        # setting parameters with the default value
+        super().__init__()
         self.a = .1             # fast spiking
         self.b = .2
         self.c = -65
         self.d = 8
+        self.initV = -65 
+        self.initU = -14 
 
     def getDv(self, I, u, v, i): 
         dv1 = f_v(I[i], u[i], v[i])*dt 
@@ -42,11 +44,11 @@ class Izh_Neuron(Neuron_):
         # input
         v = np.zeros(steps, dtype=float)
         u = np.zeros(steps, dtype=float)
-        v[0] = -65  # resting potential
-        u[0] = -14
+        v[0] = self.initV  # resting potential
+        u[0] = self.initU
 
         for t in range(steps - 1):
-            if v[t] >= -30:  # spike
+            if v[t] >= 30:  # spike
                 v[t + 1] = self.c
                 u[t + 1] = u[t] + self.d
             else: 
@@ -122,7 +124,7 @@ def plot(time, dt, v, I):
 
 
 if __name__ == '__main__':
-    n = Izh_Neuron()
+    n = Izhi_RK4()
     changeParameters(n)
 
     time = 500

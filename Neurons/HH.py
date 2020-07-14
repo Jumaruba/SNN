@@ -40,7 +40,7 @@ m = inf_m(restV)
 h = inf_h(restV) 
 
 
-class HH_Neuron(Neuron_):
+class HH(Neuron_):
     #Constans 
 
     Cm      =   1.0         # uF/cm^2 
@@ -134,7 +134,7 @@ def changeParameters(neuron):
 if __name__ == '__main__': 
 
     # Init neuron 
-    neuron = HH_Neuron()
+    neuron = HH()
     changeParameters(neuron)
 
     # Select time of iteraction 

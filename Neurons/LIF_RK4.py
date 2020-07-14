@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from Neuron import Neuron as Neuron_
 
-class Neuron(Neuron_):
+class LIF_RK4(Neuron_):
     def __init__(self):
         self.tmax = 100
         self.dt = 0.5
@@ -118,6 +118,6 @@ def plot(u, tmax, dt):
 
 
 if __name__ == '__main__':
-    n = LIF()
+    n = LIF_RK4()
     changeParameters(n)
     plot(n.stimulation(100, 10, 0.5), 100, 0.5)

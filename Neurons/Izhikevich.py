@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Izh_Neuron(Neuron_):
+class Izhi(Neuron_):
     def __init__(self):
         # setting parameters with the default value
         super().__init__()
@@ -14,35 +14,41 @@ class Izh_Neuron(Neuron_):
         self.c = -65
         self.d = 8
 
+        self.V = -65
+        self.U = -14 
+
     def stimulation(self, tmax, I, dt):
-        steps = math.ceil(time / dt)
+        steps = math.ceil(tmax / dt)
 
         # input
         v = np.zeros(steps, dtype=float)
         u = np.zeros(steps, dtype=float)
-        v[0] = -65  # resting potential
-        u[0] = -14
+        v[0] = self.V  # resting potential
+        u[0] = self.U
 
         for t in range(steps - 1):
-            if v[t] >= -30:  # spike
-                v[t + 1] = self.c
-                u[t + 1] = u[t] + self.d
-            else:
-                dv = (0.04 * v[t] * v[t] + 5 * v[t] + 140 - u[t] + I[t]) * dt
-                du = (self.a * (self.b * v[t] - u[t])) * dt
-                u[t + 1] = u[t] + du
-                v[t + 1] = v[t] + dv
+            self.nextIteration(dt, I[t])
+            v[t+1] = self.V 
+            u[t+1] = self.U
         return v
 
+
+    def nextIteration(self, dt, I):
+        for i in range(math.ceil(1/dt)): 
+            if self.V >= 30: 
+                self.V = self.c
+                self.U = self.U + self.d 
+            else: 
+                dv = (0.04 * self.V * self.V + 5 * self.V + 140 - self.U + I) * dt
+                du = (self.a * (self.b * self.V - self.U)) * dt 
+                self.V += dv
+                self.U += du
+
     def set_constants(self, a="", b="", c="", d=""):
-        if a != "":
-            self.a = a
-        if b != "":
-            self.b = b
-        if c != "":
-            self.c = c
-        if d != "":
-            self.d = d
+        if a != "": self.a = a
+        if b != "": self.b = b
+        if c != "": self.c = c
+        if d != "": self.d = d
 
 # Let the user choose the parameters
 def changeParameters(neuron): 
@@ -90,9 +96,8 @@ def plot(time, dt, v, I):
 
 
 if __name__ == '__main__':
-    n = Izh_Neuron()
+    n = Izhi()
     changeParameters(n)
-
     time = 500
     dt = 0.01
     steps = math.ceil(time / dt)
