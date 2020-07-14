@@ -3,7 +3,7 @@ Repository with several implementations of neural network models.
 
 
 ## Eugene M. Izhikevich 
-The code for this model was developed using the [paper](https://www.izhikevich.org/publications/spikes.pdf) written by Izhikevich with the constant variables described at the document. This is the [Code](Neurons/Izhikevich.py) for a single neuron. 
+The code for this model was developed using the [paper](https://www.izhikevich.org/publications/spikes.pdf) written by Izhikevich with the constant variables described at the document. This is the [Code](Neurons/Izhikevich.py) for a single neuron. The threshold used was -30 mV. 
  
 The parameter used to generate these graphs were:         
 ```python
