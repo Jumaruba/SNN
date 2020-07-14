@@ -37,6 +37,10 @@ This is a [code](Neurons/Ric_LIF.py) for a single neuron.
 
 ![](https://i.imgur.com/vh4uGSQ.png)
 
+## Spikes in a simple neural network model 
+Following the code in the [Izhikevich Paper](https://www.izhikevich.org/publications/spikes.pdf) for a simple and random SNN, we can have the following map of spikes: 
+
+![](https://i.imgur.com/nzpAe7B.png) 
 ## References: 
 
 http://worldcomp-proceedings.com/proc/p2013/BIC3207.pdf  
