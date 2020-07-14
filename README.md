@@ -42,7 +42,7 @@ Following the code in the [Izhikevich Paper](https://www.izhikevich.org/publicat
 
 ![](https://i.imgur.com/nzpAe7B.png) 
 
-The first 800 neurons are the excitatory ones and the other 200 are the inhibitory ones. 
+The first 750 neurons are the excitatory ones and the other 250 are the inhibitory ones. 
 
 ## References: 
 
