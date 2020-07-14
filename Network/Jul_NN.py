@@ -72,6 +72,7 @@ firings = n.fire()
 
 x = [firings[i][0] for i in range(len(firings))]		# neurons 
 y = [firings[i][1] for i in range(len(firings))]		# time 
+plt.title("Spikes in a SNN")
 plt.xlabel("Neurons")
 plt.ylabel("Time [ms]")
 plt.scatter(x,y, s= 0.05, color = 'black')
