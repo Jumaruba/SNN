@@ -24,16 +24,6 @@ beta_h  = lambda V: 1/(math.exp(-(V + 35) * 0.1) + 1)
 inf_h   = lambda V: alpha_h(V)/(alpha_h(V) + beta_h(V))
 
 
-# Constants 
-Cm      =   1.0         # uF/cm^2 
-VNa     =   50          # mV
-VK      =   -77         # mV
-Vl      =   -54.4       # mV
-gNa     =   120         # ms/cm^2
-gK      =   36          # ms/cm^2 
-gl      =   0.3         # ms/cm^2
-restV   =   -65         # mV
-
 # Init channels 
 n = inf_n(restV)
 m = inf_m(restV)
