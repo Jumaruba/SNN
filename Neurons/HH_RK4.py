@@ -54,27 +54,27 @@ class HH_RK4(Neuron_):
 
     def getDn(self, i, dt, v): 
         dn1 = (alpha_n(v[i])*(1-self.n)-beta_n(v[i])*self.n)*dt
-        dn2 = (alpha_n(v[i])*(1-self.n + dn1*0.5)-beta_n(v[i])*(self.n+dn1*0.5))*dt
-        dn3 = (alpha_n(v[i])*(1-self.n + dn2*0.5)-beta_n(v[i])*(self.n+dn2*0.5))*dt
-        dn4 = (alpha_n(v[i])*(1-self.n + dn3)-beta_n(v[i])*(self.n+dn3))*dt
+        dn2 = (alpha_n(v[i])*(1-(self.n + dn1*0.5))-beta_n(v[i])*(self.n+dn1*0.5))*dt
+        dn3 = (alpha_n(v[i])*(1-(self.n + dn2*0.5))-beta_n(v[i])*(self.n+dn2*0.5))*dt
+        dn4 = (alpha_n(v[i])*(1-(self.n + dn3))-beta_n(v[i])*(self.n+dn3))*dt
         dn = 1/6*(dn1 + dn2*2 + dn3*2 + dn4) 
         
         return dn 
 
     def getDm(self, i, dt, v):
         dm1 = (alpha_m(v[i])*(1-self.m)-beta_m(v[i])*self.m)*dt
-        dm2 = (alpha_m(v[i])*(1-self.m + dm1*0.5)-beta_m(v[i])*(self.m + dm1*0.5))*dt
-        dm3 = (alpha_m(v[i])*(1-self.m + dm2*0.5)-beta_m(v[i])*(self.m + dm2*0.5))*dt
-        dm4 = (alpha_m(v[i])*(1-self.m + dm3)-beta_m(v[i])*(self.m + dm3))*dt
+        dm2 = (alpha_m(v[i])*(1-(self.m + dm1*0.5))-beta_m(v[i])*(self.m + dm1*0.5))*dt
+        dm3 = (alpha_m(v[i])*(1-(self.m + dm2*0.5))-beta_m(v[i])*(self.m + dm2*0.5))*dt
+        dm4 = (alpha_m(v[i])*(1-(self.m + dm3))-beta_m(v[i])*(self.m + dm3))*dt
         dm = 1/6*(dm1 + dm2*2 + dm3*2 + dm4) 
 
         return dm 
 
     def getDh(self, i, dt, v):
         dh1 = (alpha_h(v[i])*(1-self.h)-beta_h(v[i])*self.h)*dt
-        dh2 = (alpha_h(v[i])*(1-self.h + dh1*0.5)-beta_h(v[i])*(self.h + dh1*0.5))*dt
-        dh3 = (alpha_h(v[i])*(1-self.h + dh2*0.5)-beta_h(v[i])*(self.h + dh2*0.5))*dt
-        dh4 = (alpha_h(v[i])*(1-self.h + dh3)-beta_h(v[i])*(self.h + dh3))*dt
+        dh2 = (alpha_h(v[i])*(1-(self.h + dh1*0.5))-beta_h(v[i])*(self.h + dh1*0.5))*dt
+        dh3 = (alpha_h(v[i])*(1-(self.h + dh2*0.5))-beta_h(v[i])*(self.h + dh2*0.5))*dt
+        dh4 = (alpha_h(v[i])*(1-(self.h + dh3))-beta_h(v[i])*(self.h + dh3))*dt
         dh = 1/6*(dh1 + dh2*2 + dh3*2 + dh4)
 
         return dh 
