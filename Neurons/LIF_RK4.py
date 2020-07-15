@@ -5,36 +5,36 @@ from Neuron import Neuron as Neuron_
 
 class LIF_RK4(Neuron_):
     def __init__(self):
-        self.tmax = 100
-        self.dt = 0.5
-        self.steps = math.ceil(self.tmax / self.dt)
-
         # setting parameters with the default value
         self.R = 5                                  # this values are "random"
         self.C = 3
         self.tao = self.R * self.C
-        self.I = 10                                 # for now, it will be constant
         self.uR = -40
         self.thrs = -20
 
-        self.u = np.zeros(self.steps, dtype=float)
-        self.u[0] = -65.0
-        self.time = 0
-    
-    def fu(self, u):
-        return (-u + self.R * self.I)/ self.tao
+    def fu(self, u, I):
+        return (-u + self.R * I) / self.tao
         
-    def stimulation(self):
-        for t in range(1, self.steps):
-            if self.u[t - 1] >= self.thrs:
-                self.u[t] = self.uR
+    def stimulation(self, tmax, I, dt):
+        steps = math.ceil(tmax / dt)
+        u = np.zeros(steps, dtype=float)
+        u[0] = -65.0
+        spike_time = []
+        time = 0
+        for t in range(1, steps):
+            if u[t - 1] >= self.thrs:
+                u[t] = self.uR
+                spike_time.append(time)
             else:
-                du1 = self.fu(self.u[t-1])*self.dt 
-                du2 = self.fu(self.u[t-1] + du1*0.5)*self.dt 
-                du3 = self.fu(self.u[t-1] + du2*0.5)*self.dt 
-                du4 = self.fu(self.u[t-1] + du3)*self.dt 
+                du1 = self.fu(u[t-1], I[t-1])*dt
+                du2 = self.fu(u[t-1] + du1*0.5, I[t-1])*dt
+                du3 = self.fu(u[t-1] + du2*0.5, I[t-1])*dt
+                du4 = self.fu(u[t-1] + du3, I[t-1])*dt
                 du = 1/6*(du1 + du2*2 + du3*2 + du4) 
-                self.u[t] = self.u[t - 1] + du
+                u[t] = u[t - 1] + du
+                time += dt
+        print(spike_time)
+        return u
             
     """
     This function changes the constants associated with the neuron.
@@ -62,7 +62,6 @@ class LIF_RK4(Neuron_):
         if dt != "":
             self.dt = dt
 
-
     def plot(self):
         vTime = np.arange(0, self.tmax, self.dt, dtype=None)
         plt.plot(vTime, self.u, color='b')
@@ -81,7 +80,7 @@ def changeParameters(neuron):
         print()
         print("{:47}".format("R [Resistence]  (actual = %.2f)" %neuron.R) + "[1]")
         print("{:47}".format("C [Capacitor]   (actual = %.2f mV)" %neuron.C) + "[2]")
-        print("{:47}".format("i [Current]     (actual = %.2f mV)" %neuron.I) + "[3]")
+        #print("{:47}".format("i [Current]     (actual = %.2f mV)" %neuron.I) + "[3]")
         print("{:47}".format("u_r [U after spike] (actual = %.2f mV)" %neuron.uR) + "[4]")
         print("{:47}".format("thrs [Threshold value] (actual = %.2f mV)" %neuron.thrs) + "[5]")
         print()
@@ -119,5 +118,6 @@ def plot(u, tmax, dt):
 
 if __name__ == '__main__':
     n = LIF_RK4()
-    changeParameters(n)
-    plot(n.stimulation(100, 10, 0.5), 100, 0.5)
+    #changeParameters(n)
+    I = np.concatenate((10*np.ones(math.ceil(100 / 0.5 / 2)), 0*np.ones(math.ceil(100 / 0.5 / 2))))
+    plot(n.stimulation(100, I, 0.5), 100, 0.5)

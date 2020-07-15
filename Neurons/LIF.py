@@ -19,12 +19,14 @@ class LIF(Neuron_):
         steps = math.ceil(tmax / dt)
 
         u = np.zeros(steps, dtype=float)
-
         u[0] = -65.0
+        spike_time = []
+        time = 0
 
         for t in range(1, steps):
             if u[t - 1] >= self.thrs:
                 u[t] = self.uR
+                spike_time.append(time)
             else:
                 du = (-u[t - 1] + self.R * I[t]) * dt / (self.R * self.C)
                 u[t] = u[t - 1] + du
@@ -104,4 +106,5 @@ def plot(u, tmax, dt):
 if __name__ == '__main__':
     n = LIF()
     #changeParameters(n)
-    plot(n.stimulation(100, 10*np.ones(math.ceil(100 / 0.5)), 0.5), 100, 0.5)
+    I = np.concatenate( (10*np.ones(math.ceil(100 / 0.5 / 2)), 0*np.ones(math.ceil(100 / 0.5 / 2))))
+    plot(n.stimulation(100, I, 0.5), 100, 0.5)
