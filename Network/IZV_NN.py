@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 
 '''
-@def Simple network for neurons with one layer of neurons 
+@def Simple network for neurons with one layer of neurons explained at izhikevich paper 
 @param numNeurons: number of neurons 
 '''
 
