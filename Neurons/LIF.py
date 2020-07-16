@@ -67,7 +67,7 @@ def changeParameters(neuron):
         print()
         print("{:47}".format("R [Resistence]  (actual = %.2f)" %neuron.R) + "[1]")
         print("{:47}".format("C [Capacitor]   (actual = %.2f mV)" %neuron.C) + "[2]")
-        #print("{:47}".format("i [Current]     (actual = %.2f mV)" %neuron.I) + "[3]")
+        # print("{:47}".format("i [Current]     (actual = %.2f mV)" %neuron.I) + "[3]")
         print("{:47}".format("u_r [U after spike] (actual = %.2f mV)" %neuron.uR) + "[4]")
         print("{:47}".format("thrs [Threshold value] (actual = %.2f mV)" %neuron.thrs) + "[5]")
         print()
@@ -105,6 +105,7 @@ def plot(u, tmax, dt):
 
 if __name__ == '__main__':
     n = LIF()
-    #changeParameters(n)
-    I = np.concatenate( (10*np.ones(math.ceil(100 / 0.5 / 2)), 0*np.ones(math.ceil(100 / 0.5 / 2))))
+    # changeParameters(n)
+    # I = np.concatenate( (10*np.ones(math.ceil(100 / 0.5 / 2)), 0*np.ones(math.ceil(100 / 0.5 / 2))))
+    I = 5*np.ones(math.ceil(100 / 0.5))
     plot(n.stimulation(100, I, 0.5), 100, 0.5)

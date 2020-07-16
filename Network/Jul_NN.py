@@ -46,7 +46,7 @@ class Network:
 		steps = m.ceil(time/dt)
 		firings = []				# all occurrences of firing (neuron, time)
 		for t in range(time): 
-			i = np.concatenate((np.random.normal(1, 1, self.Ni)*5, np.random.normal(1, 1, self.Ne)*2), axis=0)
+			I = np.concatenate((np.random.normal(1, 1, self.Ni)*5, np.random.normal(1, 1, self.Ne)*2), axis=0)
 			fired = [i for i in range(self.numNeurons) if self.neurons[i].V >= 30]
 
 			if len(firings) == 0: 
@@ -56,18 +56,18 @@ class Network:
 
 			# update U and V to the fired ones 
 			for i in range(len(fired)):
-				self.neurons[fired[i]].nextIteration(0.5, i[fired[i]])
+				self.neurons[fired[i]].nextIteration(0.5, I[fired[i]])
 
 			# update I
-			i = i + np.sum(self.weights[:, fired], axis=1)
+			I = I + np.sum(self.weights[:, fired], axis=1)
 			
-			for i in range(self.numNeurons): 
-				self.neurons[i].nextIteration(0.5, i[i])
+			for i in range(self.numNeurons):
+				self.neurons[i].nextIteration(0.5, I[i])
 
 		return firings 
 
 
-n = Network(1000)  
+n = Network(100)
 
 firings = n.fire() 
 
