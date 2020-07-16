@@ -12,7 +12,6 @@ class LIF(Neuron_):
         super().__init__()
         self.R = 5  # this values are "random"
         self.C = 3
-        self.I = 10  # for now, it will be constant
         self.uR = -40
         self.thrs = -20
 
@@ -21,12 +20,15 @@ class LIF(Neuron_):
 
         u = np.zeros(steps, dtype=float)
         u[0] = -65.0
+        spike_time = []
+        time = 0
 
         for t in range(1, steps):
             if u[t - 1] >= self.thrs:
                 u[t] = self.uR
+                spike_time.append(time)
             else:
-                du = (-u[t - 1] + self.R * I) * dt / (self.R * self.C)
+                du = (-u[t - 1] + self.R * I[t]) * dt / (self.R * self.C)
                 u[t] = u[t - 1] + du
         return u
         
@@ -65,7 +67,7 @@ def changeParameters(neuron):
         print()
         print("{:47}".format("R [Resistence]  (actual = %.2f)" %neuron.R) + "[1]")
         print("{:47}".format("C [Capacitor]   (actual = %.2f mV)" %neuron.C) + "[2]")
-        print("{:47}".format("i [Current]     (actual = %.2f mV)" %neuron.I) + "[3]")
+        # print("{:47}".format("i [Current]     (actual = %.2f mV)" %neuron.I) + "[3]")
         print("{:47}".format("u_r [U after spike] (actual = %.2f mV)" %neuron.uR) + "[4]")
         print("{:47}".format("thrs [Threshold value] (actual = %.2f mV)" %neuron.thrs) + "[5]")
         print()
@@ -103,5 +105,7 @@ def plot(u, tmax, dt):
 
 if __name__ == '__main__':
     n = LIF()
-    changeParameters(n)
-    plot(n.stimulation(100, 10, 0.5), 100, 0.5)
+    # changeParameters(n)
+    # I = np.concatenate( (10*np.ones(math.ceil(100 / 0.5 / 2)), 0*np.ones(math.ceil(100 / 0.5 / 2))))
+    I = 5*np.ones(math.ceil(100 / 0.5))
+    plot(n.stimulation(100, I, 0.5), 100, 0.5)
