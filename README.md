@@ -40,7 +40,7 @@ This is a [code](Neurons/Ric_LIF.py) for a single neuron.
 ## Spikes in a simple neural network model 
 Following the code in the [Izhikevich Paper](https://www.izhikevich.org/publications/spikes.pdf) for a simple and random SNN, we can have the following map of spikes: 
 
-![](https://i.imgur.com/nzpAe7B.png) 
+![](https://i.imgur.com/bx4Mb9Z.png)
 
 The first 750 neurons are the excitatory ones and the other 250 are the inhibitory ones. 
 
