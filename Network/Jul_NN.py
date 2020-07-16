@@ -38,7 +38,8 @@ class Network:
 
 	def generate_weights(self):
 		self.weights = np.random.rand(self.numNeurons, self.numNeurons) 
-		self.weights[:, self.Ni:] *= -1
+		self.weights[:, self.Ne:] *= -1
+		self.weights[:, :self.Ne] *= 0.5
 	
 	def fire(self):
 		time = 1000 
@@ -55,14 +56,14 @@ class Network:
 				firings = np.concatenate((firings, [[neuronNumber, t] for neuronNumber in fired]), axis=0)
 
 			# update U and V to the fired ones 
-			for i in range(len(fired)):
-				self.neurons[fired[i]].nextIteration(0.5, i[fired[i]])
+			for k in range(len(fired)):
+				self.neurons[fired[k]].nextIteration(0.5, i[fired[k]])
 
 			# update I
 			i = i + np.sum(self.weights[:, fired], axis=1)
 			
-			for i in range(self.numNeurons): 
-				self.neurons[i].nextIteration(0.5, i[i])
+			for k in range(self.numNeurons): 
+				self.neurons[k].nextIteration(0.5, i[k])
 
 		return firings 
 
