@@ -14,12 +14,13 @@ class LIF(Neuron_):
         self.C = 3
         self.uR = -40
         self.thrs = -20
+        self.initial_u = -65
 
     def stimulation(self, tmax, I, dt):
         steps = math.ceil(tmax / dt)
 
         u = np.zeros(steps, dtype=float)
-        u[0] = -65.0
+        u[0] = self.initial_u
         spike_time = []
         time = 0
 
@@ -31,26 +32,31 @@ class LIF(Neuron_):
                 du = (-u[t - 1] + self.R * I[t]) * dt / (self.R * self.C)
                 u[t] = u[t - 1] + du
         return u
+
+    def create_copy(self):
+        n = LIF()
+        n.set_constants(self.R, self.C, self.I, self.uR, self.thrs, self.initial_u)
+        return n
+
         
     """
     This function changes the constants associated with the neuron.
     r -> Resistence;    c -> Capacitor;     i -> Intensity of current;      
     u_r -> value of U after spike;      thrs -> value of threshold;     initial_u -> initial value of U
     """
-
-    def set_constants(self, r="", c="", i="", u_r="", thrs="", initial_u=""):
-        if r != "":
+    def set_constants(self, r=None, c=None, i=None, u_r=None, thrs=None, initial_u=None):
+        if r:
             self.R = r
-        if c != "":
+        if c:
             self.C = c
-        if i != "":
+        if i:
             self.I = i
-        if u_r != "":
+        if u_r:
             self.uR = u_r
-        if thrs != "":
+        if thrs:
             self.thrs = thrs
-        if initial_u != "":
-            self.u[0] = initial_u
+        if initial_u:
+            self.initial_u = initial_u
 
     def set_time_interval(self, tmax="", dt=""):
         if tmax != "":

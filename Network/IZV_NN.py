@@ -68,7 +68,7 @@ class Network:
 		return firings 
 
 
-n = Network(100)
+n = Network(4)
 
 firings = n.fire() 
 

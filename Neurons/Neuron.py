@@ -16,3 +16,7 @@ class Neuron(ABC):
     @abstractmethod
     def stimulation(self, tmax, I, dt):
         pass
+
+    @abstractmethod
+    def create_copy(self):
+        pass

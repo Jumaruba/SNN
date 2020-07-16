@@ -15,7 +15,13 @@ class Izhi(Neuron_):
         self.d = 8
 
         self.V = -65
-        self.U = -14 
+        self.U = -14
+
+    def create_copy(self):
+        n = Izhi()
+        n.set_constants(self.a, self.b, self.c, self.d)
+        return n
+
 
     def stimulation(self, tmax, I, dt):
         steps = math.ceil(tmax / dt)
@@ -44,11 +50,11 @@ class Izhi(Neuron_):
                 self.V += dv
                 self.U += du
 
-    def set_constants(self, a="", b="", c="", d=""):
-        if a != "": self.a = a
-        if b != "": self.b = b
-        if c != "": self.c = c
-        if d != "": self.d = d
+    def set_constants(self, a=None, b=None, c=None, d=None):
+        if a: self.a = a
+        if b: self.b = b
+        if c: self.c = c
+        if d: self.d = d
 
 # Let the user choose the parameters
 def changeParameters(neuron): 
@@ -97,6 +103,9 @@ def plot(time, dt, v, I):
 
 if __name__ == '__main__':
     n = Izhi()
+    n1 = n.create_copy()
+
+    """
     changeParameters(n)
     time = 500
     dt = 0.5
@@ -105,3 +114,4 @@ if __name__ == '__main__':
     I = 10*np.ones(math.ceil(time / dt))
     v = n.stimulation(time, I, dt)
     plot(time, dt, v, I)
+    """
