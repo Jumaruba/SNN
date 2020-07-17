@@ -46,6 +46,7 @@ class Network:
 		dt = 0.5
 		steps = m.ceil(time/dt)
 		firings = []				# all occurrences of firing (neuron, time)
+
 		for t in range(time): 
 			I = np.concatenate((np.random.normal(1, 1, self.Ni)*5, np.random.normal(1, 1, self.Ne)*2), axis=0)
 			fired = [i for i in range(self.numNeurons) if self.neurons[i].V >= 30]
@@ -66,13 +67,16 @@ class Network:
 			for k in range(self.numNeurons): 
 				self.neurons[k].nextIteration(0.5, I[k])
 
+		np.savetxt('weights.csv', self.weights, delimiter=';')
+		np.savetxt('firings.csv', firings, delimiter=';')
+
 		return firings 
 
 
-n = Network(4, Izhi())
+#n = Network(4, Izhi())
 
-firings = n.fire() 
-
+#firings = n.fire()
+firings = np.loadtxt('firings.csv', delimiter=";")
 x = [firings[i][0] for i in range(len(firings))]		# neurons 
 y = [firings[i][1] for i in range(len(firings))]		# time 
 plt.title("Spikes in a SNN")
