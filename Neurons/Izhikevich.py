@@ -38,7 +38,6 @@ class Izhi(Neuron_):
             u[t+1] = self.U
         return v
 
-
     def nextIteration(self, dt, I):
         for i in range(math.ceil(1/dt)): 
             if self.V >= 30: 

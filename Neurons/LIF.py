@@ -23,7 +23,30 @@ class LIF(Neuron_):
         u[0] = self.initial_u
         spike_time = []
         time = 0
+        if self.method == "el":
+            self.do_el(I, dt, spike_time, steps, time, u)
+        else:
+            self.do_rk4(I, dt, spike_time, steps, time, u)
 
+
+        return u
+
+
+    def do_rk4(self, I, dt, spike_time, steps, time, u):
+        for t in range(1, steps):
+            if u[t - 1] >= self.thrs:
+                u[t] = self.uR
+                spike_time.append(time)
+            else:
+                du1 = self.fu(u[t - 1], I[t - 1]) * dt
+                du2 = self.fu(u[t - 1] + du1 * 0.5, I[t - 1]) * dt
+                du3 = self.fu(u[t - 1] + du2 * 0.5, I[t - 1]) * dt
+                du4 = self.fu(u[t - 1] + du3, I[t - 1]) * dt
+                du = 1 / 6 * (du1 + du2 * 2 + du3 * 2 + du4)
+                u[t] = u[t - 1] + du
+                time += dt
+
+    def do_el(self, I, dt, spike_time, steps, time, u):
         for t in range(1, steps):
             if u[t - 1] >= self.thrs:
                 u[t] = self.uR
@@ -31,7 +54,6 @@ class LIF(Neuron_):
             else:
                 du = (-u[t - 1] + self.R * I[t]) * dt / (self.R * self.C)
                 u[t] = u[t - 1] + du
-        return u
 
     def create_copy(self):
         n = LIF()

@@ -73,7 +73,7 @@ class Network:
 		return firings 
 
 
-#n = Network(4, Izhi())
+# n = Network(4, Izhi())
 
 #firings = n.fire()
 firings = np.loadtxt('firings.csv', delimiter=";")

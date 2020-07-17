@@ -21,21 +21,24 @@ class LIF_RK4(Neuron_):
         u[0] = -65.0
         spike_time = []
         time = 0
+        self.do_rk4(I, dt, spike_time, steps, time, u)
+        print(spike_time)
+        return u
+
+    def do_rk4(self, I, dt, spike_time, steps, time, u):
         for t in range(1, steps):
             if u[t - 1] >= self.thrs:
                 u[t] = self.uR
                 spike_time.append(time)
             else:
-                du1 = self.fu(u[t-1], I[t-1])*dt
-                du2 = self.fu(u[t-1] + du1*0.5, I[t-1])*dt
-                du3 = self.fu(u[t-1] + du2*0.5, I[t-1])*dt
-                du4 = self.fu(u[t-1] + du3, I[t-1])*dt
-                du = 1/6*(du1 + du2*2 + du3*2 + du4) 
+                du1 = self.fu(u[t - 1], I[t - 1]) * dt
+                du2 = self.fu(u[t - 1] + du1 * 0.5, I[t - 1]) * dt
+                du3 = self.fu(u[t - 1] + du2 * 0.5, I[t - 1]) * dt
+                du4 = self.fu(u[t - 1] + du3, I[t - 1]) * dt
+                du = 1 / 6 * (du1 + du2 * 2 + du3 * 2 + du4)
                 u[t] = u[t - 1] + du
                 time += dt
-        print(spike_time)
-        return u
-            
+
     """
     This function changes the constants associated with the neuron.
     r -> Resistence;    c -> Capacitor;     i -> Intensity of current;      
