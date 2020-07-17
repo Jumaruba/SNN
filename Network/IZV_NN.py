@@ -16,11 +16,11 @@ import matplotlib.pyplot as plt
 
 
 class Network: 
-	def __init__(self, num_neurons):
+	def __init__(self, num_neurons, neuron):
 		self.Ni = m.ceil(num_neurons / 4)   				# number of inhibitory neurons
 		self.Ne = num_neurons - self.Ni        				# number of excitatory neurons
 		self.numNeurons = num_neurons
-		self.neurons = [Izhi() for i in range(num_neurons)]
+		self.neurons = [neuron.create_copy() for i in range(num_neurons)]
 
 		self.randomize_neurons()
 		self.generate_weights()
@@ -50,10 +50,11 @@ class Network:
 			I = np.concatenate((np.random.normal(1, 1, self.Ni)*5, np.random.normal(1, 1, self.Ne)*2), axis=0)
 			fired = [i for i in range(self.numNeurons) if self.neurons[i].V >= 30]
 
-			if len(firings) == 0: 
-				firings = [[neuronNumber, t] for neuronNumber in fired]
-			else:  
-				firings = np.concatenate((firings, [[neuronNumber, t] for neuronNumber in fired]), axis=0)
+			if fired:
+				if len(firings) == 0:
+					firings = [[neuronNumber, t] for neuronNumber in fired]
+				else:
+					firings = np.concatenate((firings, [[neuronNumber, t] for neuronNumber in fired]), axis=0)
 
 			# update U and V to the fired ones 
 			for k in range(len(fired)):
@@ -68,7 +69,7 @@ class Network:
 		return firings 
 
 
-n = Network(4)
+n = Network(4, Izhi())
 
 firings = n.fire() 
 
