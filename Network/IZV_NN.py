@@ -1,10 +1,9 @@
 import sys
 import os 
 import numpy as np
-from enum import Enum
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), "Neurons"))
-from Izhikevich import Izhi 
-import random as rand  
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Neurons"))
+from Izhikevich import Izhi
+import random as rand
 import math as m 
 import matplotlib.pyplot as plt
 
@@ -68,12 +67,13 @@ class Network:
 		return firings 
 
 
+
 n = Network(4)
 
-firings = n.fire() 
+firings = n.fire()
 
-x = [firings[i][0] for i in range(len(firings))]		# neurons 
-y = [firings[i][1] for i in range(len(firings))]		# time 
+x = [firings[i][0] for i in range(len(firings))]		# neurons
+y = [firings[i][1] for i in range(len(firings))]		# time
 plt.title("Spikes in a SNN")
 plt.xlabel("Neurons")
 plt.ylabel("Time [ms]")

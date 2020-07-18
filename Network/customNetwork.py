@@ -1,22 +1,34 @@
 import sys
 import os
 import numpy as np
-from enum import Enum
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), "Neurons"))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Neurons"))
 from Izhikevich import Izhi
 import random as rand
 import math as m
 import matplotlib.pyplot as plt
 import networkx as nx
 
-'''
-@def A customizable network 
-@param Ni: inhibitory neurons 
-@param Ne: excitatory neurons 
-@param weights: matrix with weigths for each connection. The default  is to generate random weights. 
-@param time: total time of the action 
-@param dt: variation of time
+''' A customizable network based on the izhikevich neuron 
+Parameters
+-------
+Ni: integer 
+    Number of inhibitory neurons 
+Ne: integer 
+    Number of excitatory neurons 
+weights: matrix of floats or None 
+    Matrix with weights for each connection of neurons. The default is to generate random weights. 
+    Attention, the matrix must be of the size of (Ne+Ni)x(Ne+Ni). Otherwise it will lead to an error.
+time: float
+    Total amount of time for studying the network
+dt: float
+    Variation of time
+    
+Examples
+-------
+nn = CustomNetwork(Ne= 3, Ni=4) 
+nn.drawGraph()                      # for drawing the graph 
+nn.fire(verbose=True)                  
 '''
 
 
@@ -38,13 +50,9 @@ class CustomNetwork:
             raise ValueError
 
         self.neurons = [Izhi() for i in range(self.Ne + self.Ni)]
-        self.randomizeNeurons()
+        self.randomize_neurons()
 
-    '''
-    @def Set random constants for the neurons 
-    '''
-
-    def randomizeNeurons(self):
+    def randomize_neurons(self):
         for i in range(self.Ni + self.Ne):
             temp = rand.uniform(0, 1)  # random constant
             if i < self.Ne:
@@ -55,25 +63,19 @@ class CustomNetwork:
             self.neurons[i].V = -65
             self.neurons[i].U = self.neurons[i].V * self.neurons[i].b
 
-    '''
-    @def Generate the weights randomly 
-    '''
-
     def generate_weights(self):
         self.weights = np.random.rand(self.Ni + self.Ne, self.Ni + self.Ne)
         self.weights[:, self.Ne:] *= -1
         self.weights[:, :self.Ne] *= 0.5
 
-    def fire(self):
-        # parsing to avoid big expressions
-        time = self.time
-        dt = self.dt
-
+    def fire(self, verbose=False):
+        time = 1000
+        dt = 0.5
         steps = m.ceil(time / dt)
         firings = []  # all occurrences of firing (neuron, time)
         for t in range(time):
             I = np.concatenate((np.random.normal(1, 1, self.Ni) * 5, np.random.normal(1, 1, self.Ne) * 2), axis=0)
-            fired = [i for i in range(self.Ni + self.Ne) if self.neurons[i].V >= 30]
+            fired = [i for i in range(self.Ne + self.Ni) if self.neurons[i].V >= 30]
 
             if len(firings) == 0:
                 firings = [[neuronNumber, t] for neuronNumber in fired]
@@ -90,11 +92,19 @@ class CustomNetwork:
             for k in range(self.Ne + self.Ni):
                 self.neurons[k].nextIteration(0.5, I[k])
 
-    '''
-    @def Method responsible to draw the structure of the network 
+        return firings
+
+    ''' Method responsible for drawing the structure of the network 
+   
+    Parameters 
+    -------
+    edgeLabel: bool 
+        False case the edges weights are not wanted, True otherwise 
+        
+        
     '''
 
-    def drawGraph(self):
+    def drawGraph(self, edgeLabel=True):
 
         graph = nx.DiGraph()
         # add nodes to the graph
@@ -120,7 +130,9 @@ class CustomNetwork:
                 else:
                     node_label[i] = str(i) + ":" + str(weight_value)
 
+        # relable the nodes with the weight
         graph = nx.relabel_nodes(graph, node_label, copy=False)
+
         # set the edges between neurons
         pos = nx.circular_layout(graph)
         nx.draw_networkx_nodes(graph, pos, node_size=800, node_color=colors, with_labels=True)
@@ -129,12 +141,23 @@ class CustomNetwork:
                                edge_color=edgeColor)
 
         nx.draw_networkx_labels(graph, pos, font_size=6, font_weight="bold")
-        labels = nx.get_edge_attributes(graph, 'label')
+        if edgeLabel:
+            labels = nx.get_edge_attributes(graph, 'label')
+            nx.draw_networkx_edge_labels(graph, pos, label_pos=0.8, font_size=7, edge_labels=labels, labels=True)
 
-        nx.draw_networkx_edge_labels(graph, pos, label_pos=0.8, font_size=7, edge_labels=labels, labels=True)
+        plt.show()
 
+    def plot(self):
+        firings = self.fire()
+        firings_size = len(firings)
+        x = [firings[i][0] for i in range(firings_size)]  # neurons
+        y = [firings[i][1] for i in range(firings_size)]  # time
+        plt.title("Spikes in a SNN")
+        plt.xlabel("Neurons")
+        plt.ylabel("Time [ms]")
+        plt.scatter(x, y, s=0.05, color='black')
         plt.show()
 
 
 nn = CustomNetwork(3, 2)
-nn.drawGraph()
+nn.plot()
