@@ -24,6 +24,8 @@ time: float
     Total amount of time for studying the network
 dt: float
     Variation of time
+I: array of floats 
+    Initial input. Default = random input 
     
 Examples
 -------
@@ -37,14 +39,18 @@ nn.export_csv()                     # export the result of the fires as csv form
 
 
 class CustomNetwork:
-    def __init__(self, Ne=800, Ni=200, weights=None, time=1000, dt=0.5):
+    def __init__(self, Ne=800, Ni=200, weights=None, time=1000, dt=0.5, I=None):
         self.Ne = Ne
         self.Ni = Ni
         self.time = time
         self.dt = dt
         self.firings = [] 
+        if I: self.I = np.array(I)
+        else: 
+            self.I = np.concatenate((np.random.normal(1, 1, self.Ni) * 5, np.random.normal(1, 1, self.Ne) * 2), axis=0)
+            print("I:", self.I)
 
-        if weights: self.weigths = weights
+        if weights: self.weights = np.array(weights)
         else:       self.generate_weights()
 
         # the weight matrix must be (ne + ni) x (ne + ni )
@@ -66,6 +72,20 @@ class CustomNetwork:
 
             self.neurons[i].V = -65
             self.neurons[i].U = self.neurons[i].V * self.neurons[i].b
+    
+    def set_neurons(self, a, b, c, d, V=-65, U=None, neuronNumber = None):
+        if neuronNumber: 
+            self.neurons[neuronNumber].set_constants(a,b,c,d) 
+            self.neurons[i].V = V 
+            if U: self.neurons[i].U = U 
+            else: self.neurons[i].U = self.neurons[i].V * self.neurons[i].b      
+        else: 
+            for i in range(self.Ni + self.Ne): 
+                self.neurons[i].set_constants(a,b,c,d)
+                self.neurons[i].V = V 
+                if U: self.neurons[i].U = U
+                else: self.neurons[i].U = self.neurons[i].V * self.neurons[i].b 
+
 
     def generate_weights(self):
         self.weights = np.random.rand(self.Ni + self.Ne, self.Ni + self.Ne)
@@ -86,7 +106,7 @@ class CustomNetwork:
         fire_time = []  # all occurrences of firing (neuron, time)
 
         for t in range(self.time):
-            I = np.concatenate((np.random.normal(1, 1, self.Ni) * 5, np.random.normal(1, 1, self.Ne) * 2), axis=0)
+            
             fired = [i for i in range(self.Ne + self.Ni) if self.neurons[i].V >= 30]
             len_fired = len(fired)
             len_firings = len(self.firings)
@@ -107,13 +127,13 @@ class CustomNetwork:
 
             # update U and V to the fired ones
             for k in range(len_fired):
-                self.neurons[fired[k]].nextIteration(0.5, I[fired[k]])
+                self.neurons[fired[k]].nextIteration(0.5, self.I[fired[k]])
 
             # update I
-            I = I + np.sum(self.weights[:, fired], axis=1)
+            self.I = self.I + np.sum(self.weights[:, fired], axis=1)
 
             for k in range(self.Ne + self.Ni):
-                self.neurons[k].nextIteration(self.dt, I[k])
+                self.neurons[k].nextIteration(self.dt, self.I[k])
 
             if verbose: 
                 print("TOTAL NUMBER OF FIRES", len_firings) 
