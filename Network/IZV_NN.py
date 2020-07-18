@@ -44,16 +44,20 @@ class Network:
         time = 1000
         dt = 0.5
         fire_time = []  # all occurrences of firing (neuron, time)
+        firings = []
         for t in range(time):
             I = np.concatenate((np.random.normal(1, 1, self.Ni) * 5, np.random.normal(1, 1, self.Ne) * 2), axis=0)
-            fired = [i for i in range(self.numNeurons) if self.neurons[i].V >= 30]
+            fired = [i for i in range(self.Ne + self.Ni) if self.neurons[i].V >= 30]
+            len_fired = len(fired)
+            len_firings = len(firings)
 
-            if len(fire_time) == 0:
-                fire_time = [[neuronNumber, t] for neuronNumber in fired]
+            if len_fired == 0: 
+                pass 
+            elif len_firings == 0:
+                firings = [[neuronNumber, t] for neuronNumber in fired]
             else:
-                time_relation = [[neuronNumber, t] for neuronNumber in fired]
-                if len(time_relation) != 0:
-                    fire_time = np.concatenate((fire_time, time_relation), axis=0)
+                fire_time = [[neuronNumber, t] for neuronNumber in fired]
+                firings = np.concatenate((firings, fire_time), axis=0)
 
             # update U and V to the fired ones
             for k in range(len(fired)):
@@ -65,7 +69,7 @@ class Network:
             for k in range(self.numNeurons):
                 self.neurons[k].nextIteration(dt, I[k])
 
-        return fire_time
+        return firings 
 
 
 n = Network(4)

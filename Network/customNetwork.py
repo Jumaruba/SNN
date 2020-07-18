@@ -3,11 +3,12 @@ import os
 import numpy as np
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Neurons"))
+
 from Izhikevich import Izhi
 import random as rand
-import math as m
 import matplotlib.pyplot as plt
 import networkx as nx
+import pandas as pd 
 
 ''' A customizable network based on the izhikevich neuron 
 Parameters
@@ -28,7 +29,10 @@ Examples
 -------
 nn = CustomNetwork(Ne= 3, Ni=4) 
 nn.drawGraph()                      # for drawing the graph 
-nn.fire(verbose=True)                  
+nn.fire(verbose=True)             
+nn.plot()                           # show the result. It's just possible to plot after nn.fire 
+nn.draw() 
+nn.export_csv()                     # export the result of the fires as csv format 
 '''
 
 
@@ -38,11 +42,10 @@ class CustomNetwork:
         self.Ni = Ni
         self.time = time
         self.dt = dt
+        self.firings = [] 
 
-        if weights:
-            self.weigths = weights
-        else:
-            self.generate_weights()
+        if weights: self.weigths = weights
+        else:       self.generate_weights()
 
         # the weight matrix must be (ne + ni) x (ne + ni )
         if len(self.weights[0]) != self.Ne + self.Ni or len(self.weights) != self.Ne + self.Ni:
@@ -54,7 +57,8 @@ class CustomNetwork:
 
     def randomize_neurons(self):
         for i in range(self.Ni + self.Ne):
-            temp = rand.uniform(0, 1)  # random constant
+            temp = rand.uniform(0, 1)   # random constant
+
             if i < self.Ne:
                 self.neurons[i].set_constants(0.02, 0.2, -0.65 + 15 * temp ** 2, 8 - 6 * temp ** 2)
             else:
@@ -68,22 +72,41 @@ class CustomNetwork:
         self.weights[:, self.Ne:] *= -1
         self.weights[:, :self.Ne] *= 0.5
 
+    '''Starts the process of excitation for a given time self.time and for intervals of time self.dt
+
+    Parameters
+    -------
+
+    verbose: bool 
+        True to show extra information about the process  
+        False otherwise 
+
+    '''
     def fire(self, verbose=False):
         fire_time = []  # all occurrences of firing (neuron, time)
 
         for t in range(self.time):
             I = np.concatenate((np.random.normal(1, 1, self.Ni) * 5, np.random.normal(1, 1, self.Ne) * 2), axis=0)
             fired = [i for i in range(self.Ne + self.Ni) if self.neurons[i].V >= 30]
+            len_fired = len(fired)
+            len_firings = len(self.firings)
 
-            if len(fire_time) == 0:
-                fire_time = [[neuronNumber, t] for neuronNumber in fired]
+            if verbose: 
+                print("FIRED NEURONS NOW        -------", fired)
+                print("NUMBER OF FIRED NEURONS  --------", len_fired)
+                print("TIME PASSED              -------- %d ms" %(t+1))
+                print()
+
+            if len_fired == 0: 
+                pass 
+            elif len_firings == 0:
+                self.firings = [[neuronNumber, t] for neuronNumber in fired]
             else:
-                time_relation = [[neuronNumber, t] for neuronNumber in fired]
-                if len(time_relation) != 0:
-                    fire_time = np.concatenate((fire_time, time_relation), axis=0)
+                fire_time = [[neuronNumber, t] for neuronNumber in fired]
+                self.firings = np.concatenate((self.firings, fire_time), axis=0)
 
             # update U and V to the fired ones
-            for k in range(len(fired)):
+            for k in range(len_fired):
                 self.neurons[fired[k]].nextIteration(0.5, I[fired[k]])
 
             # update I
@@ -92,7 +115,8 @@ class CustomNetwork:
             for k in range(self.Ne + self.Ni):
                 self.neurons[k].nextIteration(self.dt, I[k])
 
-        return fire_time
+            if verbose: 
+                print("TOTAL NUMBER OF FIRES", len_firings) 
 
     ''' Method responsible for drawing the structure of the network 
    
@@ -147,17 +171,24 @@ class CustomNetwork:
 
         plt.show()
 
+    '''Plot the relation time x neuron excitation
+    '''
     def plot(self):
-        firings = self.fire()
-        firings_size = len(firings)
-        x = [firings[i][0] for i in range(firings_size)]  # neurons
-        y = [firings[i][1] for i in range(firings_size)]  # time
+        firings_size = len(self.firings)
+        x = [self.firings[i][0] for i in range(firings_size)]  # neurons
+        y = [self.firings[i][1] for i in range(firings_size)]  # time
         plt.title("Spikes in a SNN")
         plt.xlabel("Neurons")
         plt.ylabel("Time [ms]")
-        plt.scatter(x, y, s=0.05, color='black')
+        plt.scatter(x, y, s=0.1, color='black')
         plt.show()
 
+    def get_dataframe(self): 
+        df = pd.DataFrame(self.firings)
+        df.rename(columns = {0: 'neurons', 1: 'time[ms]'}, inplace=True)
+        return df 
 
-nn = CustomNetwork(3, 2)
-nn.plot()
+    def export_csv(self): 
+        self.get_dataframe().to_csv('out.csv')
+
+
