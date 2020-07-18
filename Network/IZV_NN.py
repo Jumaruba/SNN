@@ -51,8 +51,10 @@ class Network:
 
 			if len(firings) == 0: 
 				firings = [[neuronNumber, t] for neuronNumber in fired]
-			else:  
-				firings = np.concatenate((firings, [[neuronNumber, t] for neuronNumber in fired]), axis=0)
+			else:
+				time_relation = [[neuronNumber, t] for neuronNumber in fired]
+				if len(time_relation) != 0:
+					firings = np.concatenate((firings, time_relation), axis=0)
 
 			# update U and V to the fired ones 
 			for k in range(len(fired)):
