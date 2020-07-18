@@ -69,18 +69,18 @@ class CustomNetwork:
         self.weights[:, :self.Ne] *= 0.5
 
     def fire(self, verbose=False):
-        time = 1000
-        dt = 0.5
-        steps = m.ceil(time / dt)
-        firings = []  # all occurrences of firing (neuron, time)
-        for t in range(time):
+        fire_time = []  # all occurrences of firing (neuron, time)
+
+        for t in range(self.time):
             I = np.concatenate((np.random.normal(1, 1, self.Ni) * 5, np.random.normal(1, 1, self.Ne) * 2), axis=0)
             fired = [i for i in range(self.Ne + self.Ni) if self.neurons[i].V >= 30]
 
-            if len(firings) == 0:
-                firings = [[neuronNumber, t] for neuronNumber in fired]
+            if len(fire_time) == 0:
+                fire_time = [[neuronNumber, t] for neuronNumber in fired]
             else:
-                firings = np.concatenate((firings, [[neuronNumber, t] for neuronNumber in fired]), axis=0)
+                time_relation = [[neuronNumber, t] for neuronNumber in fired]
+                if len(time_relation) != 0:
+                    fire_time = np.concatenate((fire_time, time_relation), axis=0)
 
             # update U and V to the fired ones
             for k in range(len(fired)):
@@ -90,9 +90,9 @@ class CustomNetwork:
             I = I + np.sum(self.weights[:, fired], axis=1)
 
             for k in range(self.Ne + self.Ni):
-                self.neurons[k].nextIteration(0.5, I[k])
+                self.neurons[k].nextIteration(self.dt, I[k])
 
-        return firings
+        return fire_time
 
     ''' Method responsible for drawing the structure of the network 
    
