@@ -31,7 +31,6 @@ class LIF(Neuron_):
 
         return u
 
-
     def do_rk4(self, I, dt, spike_time, steps, time, u):
         for t in range(1, steps):
             if u[t - 1] >= self.thrs:
