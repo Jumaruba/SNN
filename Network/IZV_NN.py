@@ -38,6 +38,8 @@ class Network:
         self.weights = np.random.rand(self.numNeurons, self.numNeurons)
         self.weights[:, self.Ne:] *= -1
         self.weights[:, :self.Ne] *= 0.5
+        for i in range(self.numNeurons):
+            self.weights[i, i] = 0.0001
 
     def fire(self):
         time = 1000
@@ -71,7 +73,7 @@ class Network:
         return firings 
 
 
-
+n = Network(1000)
 firings = n.fire()
 
 x = [firings[i][0] for i in range(len(firings))]  # neurons
