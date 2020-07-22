@@ -41,13 +41,13 @@ class Network:
 
         u1 = self.neurons[0].get_u()
         u2 = self.neurons[1].get_u()
-        plot(u1, dur, dt)
-        plot(u2, dur, dt)
+        plot(u1, u2, dur, dt)
 
 
-def plot(u, tmax, dt):
+def plot(u1, u2, tmax, dt):
     vTime = np.arange(0, tmax, dt, dtype=None)
-    plt.plot(vTime, u, color='b')
+    plt.plot(vTime, u1, color='b')
+    plt.plot(vTime, u2, color='r')
     plt.title("LIF neuron")
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [mv]")
