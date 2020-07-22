@@ -13,4 +13,5 @@ class Network(object):
         self.weights = [np.random.randn(x, y) for x, y in zip(sizes[:-1], sizes[1:])]
 
     def STDP(self):
-        pass    # to do
+        
+        pass

@@ -27,8 +27,6 @@ class LIF(Neuron_):
             self.do_el(I, dt, spike_time, steps, time, u)
         else:
             self.do_rk4(I, dt, spike_time, steps, time, u)
-
-
         return u
 
     def do_rk4(self, I, dt, spike_time, steps, time, u):
