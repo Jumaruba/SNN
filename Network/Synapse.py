@@ -11,7 +11,7 @@ tau_s = 10 			# [ms] pyke
 El = -70			# [mV]
 rm_gs = 0.05			
 Rm_Ie = 25			# [mV]
-V_trhs = -54		# [mV]
+V_trhs = -54			# [mV]
 dt = 0.05			# [mS]  
 T = 100				# [mS] total time of analyses  
 Pmax = 1 
@@ -23,6 +23,10 @@ Parameters
 -------
 In: boolean 
 	True if the neuron is inhibitory and False if it's excitatory 
+dt: float
+	Delta time 
+T: float 
+	Total time to be analysed 
 
 '''
 class LIF:
@@ -71,21 +75,18 @@ if __name__ == '__main__':
 	neurons = [n1, n2]
 	n1.pre_neurons = [neurons[1]]
 	n2.pre_neurons = [neurons[0]] 
-	n1.v[0] = El + Rm_Ie
-	n2.v[0] = El + Rm_Ie
- 
+	n1.v[0] = n2.v[0] = El + Rm_Ie 
 
 	# spikes = dirac(t).timeV 
 	for i in range(1,steps): 
 		for neuron in neurons: 
-			if i == 0: 
-				neuron.v[0] = El
-			else:  
-				neuron.step(i) 
+			if i == 0: neuron.v[0] = El
+			else: neuron.step(i) 
+				
+	# plot 
 	l1 = [n1.time[i] for i in range(steps) if n1.dirac[i] == 1]
 	l2 = [n1.time[i] for i in range(steps) if n2.dirac[i] == 1]
-	print(l1)
-	print(l2)
+
 	time = np.arange(0,T,dt)
 	plt.figure()
 	plt.subplot(3,1,1)
