@@ -33,9 +33,9 @@ class Network:
             time += dt
             spiked1 = self.neurons[0].nextIteration(i, dt)
             spiked2 = self.neurons[1].nextIteration(i, dt)
+
             if spiked1:
                 self.synapses[self.neurons[0]].transmit(time)
-
             if spiked2:
                 self.synapses[self.neurons[1]].transmit(time)
 
@@ -46,9 +46,9 @@ class Network:
 
 def plot(u1, u2, tmax, dt):
     vTime = np.arange(0, tmax, dt, dtype=None)
-    plt.plot(vTime, u1, color='b')
-    plt.plot(vTime, u2, color='r')
-    plt.title("LIF neuron")
+    plt.plot(vTime, u1, color='b', label="V1")
+    plt.plot(vTime, u2, color='r', label="V2")
+    plt.title("Neural Network")
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [mv]")
     plt.show()
