@@ -80,8 +80,7 @@ if __name__ == '__main__':
 	# spikes = dirac(t).timeV 
 	for i in range(1,steps): 
 		for neuron in neurons: 
-			if i == 0: neuron.v[0] = El
-			else: neuron.step(i) 
+			neuron.step(i) 
 				
 	# plot 
 	l1 = [n1.time[i] for i in range(steps) if n1.dirac[i] == 1]
