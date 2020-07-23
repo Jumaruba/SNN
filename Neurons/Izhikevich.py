@@ -55,39 +55,6 @@ class Izhi(Neuron_):
         if d: self.d = d
 
 
-# Let the user choose the parameters
-def changeParameters(neuron):
-    while (1):
-        print("--------------------CHOOSE PARAMETER--------------------")
-        print()
-        print("Would you to change any constant?")
-        print()
-        print("{:47}".format("a  (actual = %.2f)" % neuron.a) + "[1]")
-        print("{:47}".format("b  (actual = %.2f mV)" % neuron.b) + "[2]")
-        print("{:47}".format("c  (actual = %.2f mV)" % neuron.c) + "[3]")
-        print("{:47}".format("d  (actual = %.2f mV)" % neuron.d) + "[4]")
-        print()
-        print("{:47}".format("Show Graph") + "[5]")
-        print()
-        option = float(input("Option: "))
-        if option < 1 or option > 5:
-            print("Invalid option!")
-        elif option == 5:
-            break
-        else:
-            value = float(input("Type the value: "))
-
-            if option == 1:
-                neuron.a = value
-            elif option == 2:
-                neuron.b = value
-            elif option == 3:
-                neuron.c = value
-            elif option == 4:
-                neuron.d = value
-
-            print()
-
 
 def plot(time, dt, v, I):
     vTime = np.arange(0, time, dt, dtype=None)
@@ -105,7 +72,6 @@ if __name__ == '__main__':
     n1 = n.create_copy()
 
     """
-    changeParameters(n)
     time = 500
     dt = 0.5
     steps = math.ceil(time / dt)

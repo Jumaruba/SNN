@@ -75,57 +75,11 @@ class HH(Neuron_):
 
         return v
 
-# Let the user choose the parameters
-def changeParameters(neuron): 
-    while(1): 
-        print("--------------------CHOOSE PARAMETER--------------------")
-        print()
-        print("Would you to change any constant?")
-        print()
-        print("{:47}".format("Cm  (actual = %.2f uF/cm^2)" %neuron.Cm) + "[1]")
-        print("{:47}".format("VNa (actual = %.2f mV)" %neuron.VNa) + "[2]")
-        print("{:47}".format("VK  (actual = %.2f mV)" %neuron.VK) + "[3]")
-        print("{:47}".format("Vl  (actual = %.2f mV)" %neuron.Vl) + "[4]")
-        print("{:47}".format("gNa (actual = %.2f mV)" %neuron.gNa) + "[5]")
-        print("{:47}".format("gK  (actual = %.2f ms/cm^2)" %neuron.gK) + "[6]")
-        print("{:47}".format("gl  (actual = %.2f ms/cm^2)" %neuron.gl) + "[7]")
-        print("{:47}".format("restV (actual = %.2f mV)" %neuron.restV) + "[8]")
-        print()
-        print("{:47}".format("Show Graph") + "[9]")
-        print()
-        option = float(input("Option: ")) 
-        if option < 1 or option > 9: 
-            print("Invalid option!")
-        elif option == 9:
-            break 
-        else: 
-            value = float(input("Type the value: "))
-            
-            if option == 1: 
-                neuron.Cm = value 
-            elif option == 2: 
-                neuron.VNa = value  
-            elif option == 3: 
-                neuron.VK = value 
-            elif option == 4: 
-                neuron.Vl = value 
-            elif option == 5: 
-                neuron.gNa = value 
-            elif option == 6: 
-                neuron.gK = value 
-            elif option == 7: 
-                neuron.gl = value 
-            elif option == 8: 
-                neuron.restV = value  
-
-            print()
-
 
 if __name__ == '__main__': 
 
     # Init neuron 
     neuron = HH()
-    changeParameters(neuron)
 
     # Select time of iteraction 
     time = 100      # ms 
