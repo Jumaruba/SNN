@@ -57,10 +57,28 @@ class LIF:
 			self.v[i-1] = 0			# setting last voltage to spike value 
 			self.v[i] = V_reset 
 		else: 
-			dv = (El - self.v[i-1] + Ps_sum* rm_gs * (self.v[i-1] - self.Es) + Rm_Ie)/tau_m*dt 
-			self.v[i] = dv + self.v[i-1] 
-			if self.v[i] >= V_trhs: 
-				self.spikes[i] = 1 
+			self.rk4(Ps_sum, i)
+
+	def euler(self, Ps_sum, i):
+		dv = (El - self.v[i - 1] + Ps_sum * rm_gs * (self.v[i - 1] - self.Es) + Rm_Ie) / tau_m * dt
+		self.v[i] = dv + self.v[i - 1]
+
+		if self.v[i] >= V_trhs:
+			self.spikes[i] = 1
+
+	def rk4(self, Ps_sum, i):
+		dv1 = self.fu(self.v[i - 1], Ps_sum) * dt
+		dv2 = self.fu(self.v[i - 1] + dv1 * 0.5, Ps_sum) * dt
+		dv3 = self.fu(self.v[i - 1] + dv2 * 0.5, Ps_sum) * dt
+		dv4 = self.fu(self.v[i - 1] + dv3, Ps_sum) * dt
+		dv = 1 / 6 * (dv1 + dv2 * 2 + dv3 * 2 + dv4)
+		self.v[i] = self.v[i - 1] + dv
+
+		if self.v[i] >= V_trhs:
+			self.spikes[i] = 1
+
+	def fu(self, v, Ps_sum):
+		return (El - v + Ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
 
 	def Ps(self, t): 
 		return Pmax*t/tau_s*np.exp(1-t/tau_s) 
@@ -86,14 +104,14 @@ if __name__ == '__main__':
 	l1 = [n1.time[i] for i in range(steps) if n1.dirac[i] == 1]
 	l2 = [n1.time[i] for i in range(steps) if n2.dirac[i] == 1]
 
-	time = np.arange(0,T,dt)
+	time = np.arange(0, T, dt)
 	plt.figure()
-	plt.subplot(3,1,1)
+	plt.subplot(3, 1, 1)
 	plt.plot(time, n1.v) 
 	plt.xlabel("t (ms)")
 	plt.ylabel("V1 (mV)")
 
-	plt.subplot(3,1,3)
+	plt.subplot(3, 1, 3)
 	plt.plot(time, n2.v)
 	plt.xlabel("t (ms)")
 	plt.ylabel("V2 (mV)")

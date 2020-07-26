@@ -28,7 +28,6 @@ class LIF(Neuron_):
         else:
             self.do_rk4(I, dt, spike_time, steps, time, u)
 
-
         return u
 
     def do_rk4(self, I, dt, spike_time, steps, time, u):
@@ -44,6 +43,9 @@ class LIF(Neuron_):
                 du = 1 / 6 * (du1 + du2 * 2 + du3 * 2 + du4)
                 u[t] = u[t - 1] + du
                 time += dt
+
+    def fu(self, u, I):
+        return (-u + self.R * I) / (self.R * self.C)
 
     def do_el(self, I, dt, spike_time, steps, time, u):
         for t in range(1, steps):
@@ -97,5 +99,6 @@ def plot(u, tmax, dt):
 
 if __name__ == '__main__':
     n = LIF()
+    n.change_method("rk")
     I = 5*np.ones(math.ceil(100 / 0.5))
     plot(n.stimulation(100, I, 0.5), 100, 0.5)
