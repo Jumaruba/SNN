@@ -1,4 +1,4 @@
-from Neuron import Neuron as Neuron_
+from Neurons.Neuron import Neuron as Neuron_
 
 import math
 import numpy as np
@@ -29,6 +29,8 @@ T: float
 	Total time to be analysed 
 
 '''
+
+
 class LIF:
 	def __init__(self, T, dt, In = False):
 
@@ -41,7 +43,10 @@ class LIF:
 		self.dirac = np.zeros(self.steps)			# dirac function 
 		self.time = np.arange(0, T, dt)				# vector representing the actual time 
 		self.spikes = np.zeros(self.steps)			# own spikes stored
-		self.pre_neurons = []		 				# pre-synaptic neurons connected to it 
+		self.pre_neurons = []		 				# pre-synaptic neurons connected to it
+
+	def add_pre_neuron(self, neuron):
+		self.pre_neurons.append(neuron)
 		
 	def step(self, i):
 		# update the dirac function 
