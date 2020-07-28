@@ -1,9 +1,17 @@
-import numpy as np
 from Neurons.Synapse import LIF
 
 
 class Network:
+    """
+    Network with several layers and neurons
+    The learning method choosen was STDP
+    """
     def __init__(self, layers):
+        """
+        Constructs the network
+        :param layers: the layers with the number of neurons, respective
+        """
+
         self.layers = layers
         self.neurons = []
         for i, lay in enumerate(layers):
@@ -17,7 +25,9 @@ class Network:
                 layer.append(neuron)     # a remover parametros
 
             self.neurons.append(layer)
-        x = 1
+
+    def STDP(self):
+        pass
 
 
 Network([2, 3, 1])
