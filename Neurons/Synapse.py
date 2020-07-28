@@ -17,32 +17,37 @@ T = 1000				# [mS] total time of analyses
 Pmax = 1 
 V_reset = -80 
 
-'''A class to keep track of the spikes 
+'''A class to keep track of the spikes transmited by a synapse 
 
+Parameters
+-------
+time: float array
+Árray responsible for store the time the neuron had a spike  
+
+lenTime: int
+Size of the time array. Yeah, I could do len(time), but for python it costs O(n) (which is too much) 
 
 '''
 class Synapse: 
 
 	def __init__(self): 
-		self.time = []						# time where spikes happened 
-		self.lenTime = 0 					# important cause python has time O(N) to find out the size of an array 	 
+		self.time = []						
+		self.lenTime = 0 					
 
 	def add_spike(self, time):
 		self.time.append(time) 
 		self.lenTime += 1
 	
+	# Checks if a spike occurred by in a specific time  
 	def check_spike(self,time): 
 		b = time in self.time 
 		return b 
 
+	# Checks if the last spike was at the specific time given 
 	def previous_spike_time(self, time): 
 		if self.lenTime - 1 < 0 : return False 
 		return self.time[self.lenTime -1] == time
 
-
-
-
-	
 
 
 '''LIF neuron with synapse implemented 
@@ -68,10 +73,10 @@ class LIF:
 		self.steps = math.ceil(T/dt)
 		self.v = np.zeros(self.steps) 				# voltage historic 
 		self.pre_neuron	= None		 				# pre-synaptic neurons connected to it
-		self.actualTime = dt 
+		self.actualTime = dt 						
 
 		self.synapse = Synapse() 
-		self.max_spikes_anal = 10 
+		self.max_spikes_anal = 10 					# max spikes to be considered by the algorithm to calculate Ps
 
 		
 	def step(self, i):
