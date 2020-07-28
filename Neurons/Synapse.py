@@ -1,4 +1,4 @@
-from Neurons.Neuron import Neuron as Neuron_
+from Neuron import Neuron as Neuron_
 
 import math
 import numpy as np
@@ -35,7 +35,6 @@ class LIF:
 	def __init__(self, T, dt, In = False):
 
 		# setting constants
-		super().__init__()
 		self.Es = 0 if In else -80  # [mV]	
 		
 		self.steps = math.ceil(T/dt)
