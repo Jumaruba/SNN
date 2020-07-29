@@ -1,21 +1,30 @@
+
+
+import sys 
+import os
+
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Neurons"))
+
 from Neuron import Neuron as Neuron_
 
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import random 
 
 
 global tau_m, El, rm_gs, Rm_Ie, Es, V_trhs, dt, T, Pmax 
 tau_m = 20 			# [ms] how fast all the action happens  
 tau_s = 10 			# [ms] pyke 
 El = -70			# [mV]
-rm_gs = 0.05			
+rm = 0.01			
 Rm_Ie = 25			# [mV]
 V_trhs = -54			# [mV]
 dt = 0.05			# [mS]  
-T = 1000			# [mS] total time of analyses  
+T = 100				# [mS] total time of analyses  
 Pmax = 1 
 V_reset = -80 
+gsMax = 10 			#pode ser necessário mudar 
 
 '''A class to keep track of the spikes transmited by a synapse 
 
@@ -48,6 +57,9 @@ class Synapse:
 		if self.lenTime - 1 < 0 : return False 
 		return self.time[self.lenTime -1] == time
 
+	def get_last_spike(self): 
+		return self.time[self.lenTime - 1]
+
 
 
 '''LIF neuron with synapse implemented 
@@ -65,26 +77,33 @@ T: float
 
 
 class LIF:
-	def __init__(self, T, dt, In = False):
+	def __init__(self, T, dt,  In = False):
 
 		# setting constants
 		self.Es = 0 if In else -80  # [mV]	
 		
 		self.steps = math.ceil(T/dt)
 		self.v = np.zeros(self.steps) 				# voltage historic 
-		self.pre_neuron	= None		 				# pre-synaptic neurons connected to it
+		self.pre_neuron	= []		 				# pre-synaptic neurons connected to it
 		self.actualTime = dt 						
+		self.gs_list = []								# list weights of pre-sytnaptic connections 
+		self.gs = 0 
+		self.spike_happened = False  
 
 		self.synapse = Synapse() 
-		self.max_spikes_anal = 100 					# max spikes to be considered by the algorithm to calculate Ps
+		self.max_spikes_anal = 10 					# max spikes to be considered by the algorithm to calculate Ps
 
+	def calculate_gs(self): 
+		self.gs = 0
+		for i in range(len(pre_neuron)):  
+			# if a spike happened, than we sum the weight for the neuron 
+			if self.pre_neuron[i].synapse.check_spike(self.actualTime): self.gs += self.gs_list[i] 
 		
 	def step(self, i):
+		self.spike_happened = False  
 		self.actualTime += dt 
 		
 		Ps_sum = self.Ps_sum() 
-
-		if Ps_sum > Pmax : Ps_sum = Pmax 
 
 		if self.v[i-1] > V_trhs: 
 			self.v[i-1] = 0			# setting last voltage to spike value 
@@ -92,10 +111,19 @@ class LIF:
 		else: 
 			self.rk4(Ps_sum, i)
 
-		if self.v[i] >= V_trhs: self.synapse.add_spike(self.actualTime) 
+		if self.v[i] >= V_trhs: 
+			self.synapse.add_spike(self.actualTime) 
+			self.LTP()									# synaptic weight is strengthned 
+
+
+
+	def LTP(self): 
+		last_spike = self.synapse.get_last_spike() 
+		# if the presynaptic spike happened after the last_spike 
+
 
 	def euler(self, Ps_sum, i):
-		dv = (El - self.v[i - 1] + Ps_sum * rm_gs * (self.v[i - 1] - self.Es) + Rm_Ie) / tau_m * dt
+		dv = (El - self.v[i - 1] + Ps_sum * rm * self.gs * (self.v[i - 1] - self.Es) + Rm_Ie) / tau_m * dt
 		self.v[i] = dv + self.v[i - 1]
 
 
@@ -109,7 +137,7 @@ class LIF:
 
 
 	def fu(self, v, Ps_sum):
-		return (El - v + Ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
+		return (El - v + Ps_sum * rm * self.gs * ps * (v - self.Es) + Rm_Ie) / tau_m
 
 	def Ps_sum(self):
 		counter = 0  
@@ -119,41 +147,44 @@ class LIF:
 				return ps_sum  
 			else: 
 				ps_sum+= self.Ps(self.actualTime - ti) 
-			counter += 1 
+		counter += 1
 		return ps_sum 
+
+	def add_pre_neuron(self, neuron):
+		self.pre_neuron.append(neuron)  
+		self.gs.append(random.random()) 			# give a weight for the connection 
 
 	def Ps(self, t): 
 		return Pmax*t/tau_s*np.exp(1-t/tau_s) 
 
-	
-if __name__ == '__main__':
-	steps = math.ceil(T/dt)
-	
-	n1 = LIF(T, dt) 
-	n2 = LIF(T, dt) 
 
-	neurons = [n1, n2]
-	#n1.pre_neuron = neurons[1]
-	#n2.pre_neuron = neurons[0]
 
-	n1.v[0] = El 
-	n2.v[0] = El 
+class Network:
+	def __init__(self, layers):
+		self.layers = layers
+		self.neurons = [] 
 
-	# spikes = dirac(t).timeV 
-	for i in range(1,steps): 
-		for neuron in neurons: 
-			neuron.step(i) 
-				
+		for i, lay in enumerate(layers):
+			layer = []
+			for j in range(lay):
+				neuron = LIF(1, 1)
+				if i != 0:
+					for pre_n in self.neurons[i - 1]:
+						neuron.add_pre_neuron(pre_n)
 
-	time = np.arange(0, T, dt)
-	plt.figure()
-	plt.subplot(3, 1, 1)
-	plt.plot(time, n1.v) 
-	plt.xlabel("t (ms)")
-	plt.ylabel("V1 (mV)")
+				layer.append(neuron)     						# a remover parametros
 
-	plt.subplot(3, 1, 3)
-	plt.plot(time, n2.v)
-	plt.xlabel("t (ms)")
-	plt.ylabel("V2 (mV)")
-	plt.show()
+			self.neurons.append(layer)
+
+	def run(self): 
+
+		steps = np.ceil(T/dt)
+		for i in range(steps): 
+			for t in range(len(layers)): 
+				for j in range(layers[t]): 
+					self.neurons[t][j].step(i)  
+
+
+					
+
+Network([2, 3, 1])
