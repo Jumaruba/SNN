@@ -24,7 +24,15 @@ dt = 0.05			# [mS]
 T = 100				# [mS] total time of analyses  
 Pmax = 1 
 V_reset = -80 
-gsMax = 10 			#pode ser necessário mudar 
+
+# STDP 
+gsMax = 10 				# might be necessary to change
+forgetTime = 40 		# [mS]  
+A_plus = 0.01 
+A_neg = 0.005			
+tau_plus = 20			# [mS]
+tau_neg = 100 			# [mS]
+
 
 '''A class to keep track of the spikes transmited by a synapse 
 
@@ -41,7 +49,7 @@ class Synapse:
 
 	def __init__(self): 
 		self.time = []						
-		self.lenTime = 0 					
+		self.lenTime = 0 				# size of the time 
 
 	def add_spike(self, time):
 		self.time.append(time) 
@@ -60,7 +68,15 @@ class Synapse:
 	def get_last_spike(self): 
 		return self.time[self.lenTime - 1]
 
+	# get the spikes from the parameter time to the current time 
+	def get_spikes_delta_time(self, time): 
+		counter = self.lenTime - 1 
+		spikes = []
+		while (counter != 0): 
+			if self.time[counter] <= time: spikes.append(self.time[counter])
+			counter -= 1 
 
+		return spikes 
 
 '''LIF neuron with synapse implemented 
 
@@ -80,29 +96,26 @@ class LIF:
 	def __init__(self, T, dt,  In = False):
 
 		# setting constants
-		self.Es = 0 if In else -80  # [mV]	
+		self.Es = -80 if In else 0  # [mV]	
 		
 		self.steps = math.ceil(T/dt)
 		self.v = np.zeros(self.steps) 				# voltage historic 
 		self.pre_neuron	= []		 				# pre-synaptic neurons connected to it
+		
 		self.actualTime = dt 						
-		self.gs_list = []								# list weights of pre-sytnaptic connections 
+		
+		# STDP 
+		self.gs_list = []							# list weights of pre-sytnaptic connections 
 		self.gs = 0 
-		self.spike_happened = False  
 
+		# Synapse 
 		self.synapse = Synapse() 
 		self.max_spikes_anal = 10 					# max spikes to be considered by the algorithm to calculate Ps
 
-	def calculate_gs(self): 
-		self.gs = 0
-		for i in range(len(pre_neuron)):  
-			# if a spike happened, than we sum the weight for the neuron 
-			if self.pre_neuron[i].synapse.check_spike(self.actualTime): self.gs += self.gs_list[i] 
-		
 	def step(self, i):
-		self.spike_happened = False  
 		self.actualTime += dt 
 		
+
 		Ps_sum = self.Ps_sum() 
 
 		if self.v[i-1] > V_trhs: 
@@ -113,13 +126,23 @@ class LIF:
 
 		if self.v[i] >= V_trhs: 
 			self.synapse.add_spike(self.actualTime) 
-			self.LTP()									# synaptic weight is strengthned 
+
+		self.STDP()  # udpate all the weights 
 
 
 
-	def LTP(self): 
-		last_spike = self.synapse.get_last_spike() 
-		# if the presynaptic spike happened after the last_spike 
+	def STDP(self): 
+		# update the value of gs for each neuron 
+		for i,neuron in enumerate(self.pre_neuron): 
+			gs = 0
+			f_t = 0
+			spikes = neuron.synapse.get_spikes_delta_time(self.actualTime)
+			# for each spike in the range of time forgetTime, get f(delta_t)
+			for spike in spikes: 
+				delta_t = self.actualTime - preTime 
+				f_t += A_plus*np.exp(delta_t/tau_plus) if delta_t > 0 else  A_neg*np.exp(delta_t/tau_neg) 
+			gs_list[i] += gsMax*f_t
+
 
 
 	def euler(self, Ps_sum, i):
@@ -152,7 +175,7 @@ class LIF:
 
 	def add_pre_neuron(self, neuron):
 		self.pre_neuron.append(neuron)  
-		self.gs.append(random.random()) 			# give a weight for the connection 
+		self.gs_list.append(random.random()) 			# give a weight for the connection 
 
 	def Ps(self, t): 
 		return Pmax*t/tau_s*np.exp(1-t/tau_s) 
