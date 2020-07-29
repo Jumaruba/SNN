@@ -26,9 +26,9 @@ Pmax = 1
 V_reset = -80 
 
 # STDP 
-gsMax = 10 				# might be necessary to change
-forgetTime = 40 		# [mS]  
-A_plus = 0.01 
+gsMax = 0.01			# Max value to gs 
+forgetTime = 40 		# [mS]  might be necessary to change 
+A_plus = 0.01 			
 A_neg = 0.005			
 tau_plus = 20			# [mS]
 tau_neg = 100 			# [mS]
@@ -42,7 +42,10 @@ time: float array
 Árray responsible for store the time the neuron had a spike  
 
 lenTime: int
-Size of the time array. Yeah, I could do len(time), but for python it costs O(n) (which is too much) 
+Size of the time array. Yeah, I could do len(time), but for python it costs O(n) (which is too much)  
+
+max_len: int 
+Maximum number of neurons to be analyzed 
 
 '''
 class Synapse: 
@@ -59,25 +62,19 @@ class Synapse:
 		self.time.append(time)
 		self.lenTime += 1
 	
-	# Checks if a spike occurred by in a specific time  
-	def check_spike(self,time): 
-		b = time in self.time 
-		return b 
-
 	# Checks if the last spike was at the specific time given 
 	def previous_spike_time(self, time): 
 		if self.lenTime - 1 < 0 : return False 
 		return self.time[self.lenTime -1] == time
 
-	def get_last_spike(self): 
-		return self.time[self.lenTime - 1]
 
-	# get the spikes from the parameter time to the current time 
+	# get the spikes from the parameter time until the current time 
 	def get_spikes_delta_time(self, time): 
 		counter = self.lenTime - 1 
 		spikes = []
 		while (counter >= 0): 
-			if self.time[counter] <= time: spikes.append(self.time[counter])
+			if self.time[counter] <= time: 
+				spikes.append(self.time[counter])
 			counter -= 1 
 
 		return spikes 
@@ -99,7 +96,7 @@ T: float
 class LIF:
 	def __init__(self, T, dt,  In = False):
 
-		# setting constants
+	# setting constants
 		self.Es = -80 if In else 0  # [mV]	
 		
 		self.steps = math.ceil(T/dt)
@@ -113,20 +110,19 @@ class LIF:
 		self.gs = 0 
 
 		# Synapse  
-
 		self.max_spikes_anal = 10 					# max spikes to be considered by the algorithm to calculate Ps
 		self.synapse = Synapse(self.max_spikes_anal) 
 
 	def step(self, i):
 		self.actualTime += dt 
 		
-
 		Ps_sum = self.Ps_sum() 
 
-		if Ps_sum > Pmax : Ps_sum = Pmax 
+		if Ps_sum > Pmax : 
+			Ps_sum = Pmax 
 
 		if self.v[i-1] > V_trhs: 
-			self.v[i-1] = 0			# setting last voltage to spike value 
+			self.v[i-1] = 0							# setting last voltage to spike value 
 			self.v[i] = V_reset 
 		else: 
 			self.rk4(Ps_sum, i)
@@ -134,7 +130,7 @@ class LIF:
 		if self.v[i] >= V_trhs: 
 			self.synapse.add_spike(self.actualTime) 
 
-		self.STDP()  # udpate all the weights 
+		self.STDP()  								# udpate all the weights 
 
 
 
