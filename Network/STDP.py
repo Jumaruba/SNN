@@ -47,12 +47,16 @@ Size of the time array. Yeah, I could do len(time), but for python it costs O(n)
 '''
 class Synapse: 
 
-	def __init__(self): 
-		self.time = []						
-		self.lenTime = 0 				# size of the time 
+	def __init__(self, max_len=20):
+		self.max_len = max_len
+		self.time = []
+		self.lenTime = 0	
 
 	def add_spike(self, time):
-		self.time.append(time) 
+		if self.lenTime == self.max_len:
+			self.time.pop(0)
+			self.lenTime -= 1
+		self.time.append(time)
 		self.lenTime += 1
 	
 	# Checks if a spike occurred by in a specific time  
@@ -72,7 +76,7 @@ class Synapse:
 	def get_spikes_delta_time(self, time): 
 		counter = self.lenTime - 1 
 		spikes = []
-		while (counter != 0): 
+		while (counter >= 0): 
 			if self.time[counter] <= time: spikes.append(self.time[counter])
 			counter -= 1 
 
@@ -99,24 +103,27 @@ class LIF:
 		self.Es = -80 if In else 0  # [mV]	
 		
 		self.steps = math.ceil(T/dt)
-		self.v = np.zeros(self.steps) 				# voltage historic 
+		self.v = np.zeros(self.steps) 				# voltage historic  
+		self.v[0] = El 
 		self.pre_neuron	= []		 				# pre-synaptic neurons connected to it
-		
 		self.actualTime = dt 						
 		
 		# STDP 
 		self.gs_list = []							# list weights of pre-sytnaptic connections 
 		self.gs = 0 
 
-		# Synapse 
-		self.synapse = Synapse() 
+		# Synapse  
+
 		self.max_spikes_anal = 10 					# max spikes to be considered by the algorithm to calculate Ps
+		self.synapse = Synapse(self.max_spikes_anal) 
 
 	def step(self, i):
 		self.actualTime += dt 
 		
 
 		Ps_sum = self.Ps_sum() 
+
+		if Ps_sum > Pmax : Ps_sum = Pmax 
 
 		if self.v[i-1] > V_trhs: 
 			self.v[i-1] = 0			# setting last voltage to spike value 
@@ -139,9 +146,9 @@ class LIF:
 			spikes = neuron.synapse.get_spikes_delta_time(self.actualTime)
 			# for each spike in the range of time forgetTime, get f(delta_t)
 			for spike in spikes: 
-				delta_t = self.actualTime - preTime 
+				delta_t = self.actualTime - spike
 				f_t += A_plus*np.exp(delta_t/tau_plus) if delta_t > 0 else  A_neg*np.exp(delta_t/tau_neg) 
-			gs_list[i] += gsMax*f_t
+			self.gs_list[i] += gsMax*f_t
 
 
 
@@ -151,6 +158,7 @@ class LIF:
 
 
 	def rk4(self, Ps_sum, i):
+
 		dv1 = self.fu(self.v[i - 1], Ps_sum) * dt
 		dv2 = self.fu(self.v[i - 1] + dv1 * 0.5, Ps_sum) * dt
 		dv3 = self.fu(self.v[i - 1] + dv2 * 0.5, Ps_sum) * dt
@@ -160,17 +168,13 @@ class LIF:
 
 
 	def fu(self, v, Ps_sum):
-		return (El - v + Ps_sum * rm * self.gs * ps * (v - self.Es) + Rm_Ie) / tau_m
+		return (El - v + Ps_sum * rm * self.gs * (v - self.Es) + Rm_Ie) / tau_m
 
 	def Ps_sum(self):
-		counter = 0  
-		ps_sum = 0 
-		for ti in self.synapse.time: 
-			if counter == self.max_spikes_anal: 
-				return ps_sum  
-			else: 
-				ps_sum+= self.Ps(self.actualTime - ti) 
-		counter += 1
+		ps_sum = 0
+		for ti in self.synapse.time:
+			ps_sum += self.Ps(self.actualTime - ti)
+		
 		return ps_sum 
 
 	def add_pre_neuron(self, neuron):
@@ -190,7 +194,7 @@ class Network:
 		for i, lay in enumerate(layers):
 			layer = []
 			for j in range(lay):
-				neuron = LIF(1, 1)
+				neuron = LIF(T, dt)
 				if i != 0:
 					for pre_n in self.neurons[i - 1]:
 						neuron.add_pre_neuron(pre_n)
@@ -200,14 +204,22 @@ class Network:
 			self.neurons.append(layer)
 
 	def run(self): 
-
-		steps = np.ceil(T/dt)
-		for i in range(steps): 
-			for t in range(len(layers)): 
-				for j in range(layers[t]): 
-					self.neurons[t][j].step(i)  
+		steps = math.ceil(T/dt) 
+		for i in range(1, steps): 
+			for t,l in enumerate(self.neurons): 
+				for j,neuron in enumerate(self.neurons[t]):
+					neuron.step(i)  
 
 
 					
 
-Network([2, 3, 1])
+n = Network([2, 3, 1])
+n.run()
+
+time = np.arange(0, T, dt)
+plt.figure()
+plt.plot(time, n.neurons[2][0].v) 
+plt.xlabel("t (ms)")
+plt.ylabel("V1 (mV)")
+
+plt.show()
