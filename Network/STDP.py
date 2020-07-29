@@ -13,21 +13,20 @@ import matplotlib.pyplot as plt
 import random 
 
 
-global tau_m, El, rm_gs, Rm_Ie, Es, V_trhs, dt, T, Pmax 
+global tau_m, El, rm_gs, Es, V_trhs, dt, T, Pmax 
 tau_m = 20 			# [ms] how fast all the action happens  
 tau_s = 10 			# [ms] pyke 
 El = -70			# [mV]
 rm = 0.01			
-Rm_Ie = 25			# [mV]
 V_trhs = -54			# [mV]
 dt = 0.05			# [mS]  
-T = 100				# [mS] total time of analyses  
+T = 1000				# [mS] total time of analyses  
 Pmax = 1 
 V_reset = -80 
 
 # STDP 
 gsMax = 0.01			# Max value to gs 
-forgetTime = 40 		# [mS]  might be necessary to change 
+forgetTime = 1000       # [mS]  might be necessary to change 
 A_plus = 0.01 			
 A_neg = 0.005			
 tau_plus = 20			# [mS]
@@ -99,6 +98,7 @@ class LIF:
 	# setting constants
 		self.Es = -80 if In else 0  # [mV]	
 		
+		self.Rm_Ie = 25			# [mV]
 		self.steps = math.ceil(T/dt)
 		self.v = np.zeros(self.steps) 				# voltage historic  
 		self.v[0] = El 
@@ -108,6 +108,7 @@ class LIF:
 		# STDP 
 		self.gs_list = []							# list weights of pre-sytnaptic connections 
 		self.gs = 0 
+		self.gs_list2 = [0]
 
 		# Synapse  
 		self.max_spikes_anal = 10 					# max spikes to be considered by the algorithm to calculate Ps
@@ -131,7 +132,7 @@ class LIF:
 			self.synapse.add_spike(self.actualTime) 
 
 		self.STDP()  								# udpate all the weights 
-
+		self.gs_list2.append(self.gs)
 
 
 	def STDP(self): 
@@ -143,13 +144,16 @@ class LIF:
 			# for each spike in the range of time forgetTime, get f(delta_t)
 			for spike in spikes: 
 				delta_t = self.actualTime - spike
-				f_t += A_plus*np.exp(delta_t/tau_plus) if delta_t > 0 else  A_neg*np.exp(delta_t/tau_neg) 
+				f_t += A_plus*np.exp(delta_t/tau_plus) if delta_t > 0 else  -A_neg*np.exp(delta_t/tau_neg) 
 			self.gs_list[i] += gsMax*f_t
+			if self.gs_list[i] > 1: 
+				self.gs_list[i] = 1 
 
+		self.gs = sum(self.gs_list) 
 
 
 	def euler(self, Ps_sum, i):
-		dv = (El - self.v[i - 1] + Ps_sum * rm * self.gs * (self.v[i - 1] - self.Es) + Rm_Ie) / tau_m * dt
+		dv = (El - self.v[i - 1] + Ps_sum * rm * self.gs * (self.v[i - 1] - self.Es) + self.Rm_Ie) / tau_m * dt
 		self.v[i] = dv + self.v[i - 1]
 
 
@@ -164,7 +168,7 @@ class LIF:
 
 
 	def fu(self, v, Ps_sum):
-		return (El - v + Ps_sum * rm * self.gs * (v - self.Es) + Rm_Ie) / tau_m
+		return (El - v + Ps_sum * rm * self.gs * (v - self.Es) + self.Rm_Ie) / tau_m
 
 	def Ps_sum(self):
 		ps_sum = 0
@@ -190,7 +194,7 @@ class Network:
 		for i, lay in enumerate(layers):
 			layer = []
 			for j in range(lay):
-				neuron = LIF(T, dt)
+				neuron = LIF(T, dt, True)
 				if i != 0:
 					for pre_n in self.neurons[i - 1]:
 						neuron.add_pre_neuron(pre_n)
@@ -214,8 +218,16 @@ n.run()
 
 time = np.arange(0, T, dt)
 plt.figure()
+plt.title("Voltage")
 plt.plot(time, n.neurons[2][0].v) 
 plt.xlabel("t (ms)")
-plt.ylabel("V1 (mV)")
+plt.ylabel("V6 (mV)")
+
+time = np.arange(0, T, dt)
+plt.figure()
+plt.title("gs")
+plt.plot(time, n.neurons[2][0].gs_list2) 
+plt.xlabel("t (ms)")
+plt.ylabel("V (mV)")
 
 plt.show()
