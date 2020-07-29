@@ -196,8 +196,10 @@ class Network:
 			for j in range(lay):
 				neuron = LIF(T, dt, True)
 				if i != 0:
+					neuron.Rm_Ie = 0 
 					for pre_n in self.neurons[i - 1]:
 						neuron.add_pre_neuron(pre_n)
+
 
 				layer.append(neuron)     						# a remover parametros
 
