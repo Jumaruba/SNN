@@ -71,7 +71,7 @@ class LIF:
         self.v = np.zeros(steps)                    # Voltage historic so as to plot results
         self.actualTime = dt
         self.pre_neuron = None                      # Pre-synaptic neurons connected to it
-        self.componente_sinaptica = 0
+        self.synaptic_component = 0
 
         max_spikes_anal = 100                       # Max spikes to be considered by the algorithm to calculate Ps
         self.spikes = Spikes(max_spikes_anal)
@@ -96,7 +96,7 @@ class LIF:
             self.spikes.add_spike(self.actualTime)
 
     def euler(self, i):
-        dv = self.fv(self.v[i - 1]) + Rm_Ie / tau_m * dt
+        dv = self.fv(self.v[i - 1]) * dt
         self.v[i] = dv + self.v[i - 1]
 
     def rk4(self, i):
@@ -108,14 +108,14 @@ class LIF:
         self.v[i] = self.v[i - 1] + dv
 
     def fv(self, v):
-        return (El - v - self.ps_sum * rm_gs * v + self.componente_sinaptica + self.Rm_Ie) / tau_m
+        return (El - v - self.ps_sum * rm_gs * v + self.synaptic_component + self.Rm_Ie) / tau_m
 
     def Ps(self):
         self.ps_sum = 0
         for ti in self.pre_neuron.spikes.time_spikes:
             t = self.actualTime - ti
             self.ps_sum += Pmax * t / tau_s * np.exp(1 - t / tau_s)         # apply ps formula for each spike
-        self.componente_sinaptica = self.ps_sum * rm_gs * self.pre_neuron.Es
+        self.synaptic_component = self.ps_sum * rm_gs * self.pre_neuron.Es
 
 
 

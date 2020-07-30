@@ -120,7 +120,6 @@ class LIF:
         self.synaptic_components = []
         self.sum_syn_comps = 0
 
-
     def step(self, i):
         self.actualTime += dt
 
@@ -170,7 +169,7 @@ class LIF:
         self.synaptic_components = []
 
     def euler(self, i):
-        dv = (El - self.v[i - 1] - rm * self.gs_ps * self.v[i - 1] + self.sum_syn_comps + self.Rm_Ie) / tau_m * dt
+        dv = self.fu(self.v[i - 1]) * dt
         self.v[i] = dv + self.v[i - 1]
 
     # to fix this one
@@ -229,7 +228,7 @@ class Network:
                     neuron.step(i)
 
 
-n = Network([1, 1])
+n = Network([1, 1, 1])
 n.run()
 
 time = np.arange(0, T, dt)
@@ -239,12 +238,12 @@ plt.plot(time, n.neurons[0][0].v)
 plt.xlabel("t (ms)")
 plt.ylabel("V1 (mV)")
 
-"""time = np.arange(0, T, dt)
+time = np.arange(0, T, dt)
 plt.figure()
 plt.title("Neuron n6")
 plt.plot(time, n.neurons[2][0].v)
 plt.xlabel("t (ms)")
-plt.ylabel("V6 (mV)")"""
+plt.ylabel("V6 (mV)")
 
 time = np.arange(0, T, dt)
 plt.figure()
