@@ -199,7 +199,7 @@ class Network:
     def __init__(self, layers):
         self.layers = layers
         self.neurons = []
-        self.choice = [True, True, True, 1, 1, False]
+        self.choice = [1, 1, False]
         for i, lay in enumerate(layers):
             layer = []
             for j in range(lay):
@@ -228,38 +228,25 @@ n.run()
 
 time = np.arange(0, T, dt)
 plt.figure()
-plt.title("Voltage neuron 0")
+plt.title("Neuron n1")
 plt.plot(time, n.neurons[0][0].v)
+plt.xlabel("t (ms)")
+plt.ylabel("V1 (mV)")
+
+time = np.arange(0, T, dt)
+plt.figure()
+plt.title("Neuron n6")
+plt.plot(time, n.neurons[2][0].v)
 plt.xlabel("t (ms)")
 plt.ylabel("V6 (mV)")
 
 time = np.arange(0, T, dt)
 plt.figure()
-plt.title("Voltage neuron final ")
-plt.plot(time, n.neurons[2][0].v)
+plt.title("Neuron n3")
+plt.plot(time, n.neurons[1][0].v)
 plt.xlabel("t (ms)")
 plt.ylabel("V3 (mV)")
 
-time = np.arange(0, T, dt)
-plt.figure()
-plt.title("Hidden Layer")
-plt.plot(time, n.neurons[1][0].v)
-plt.xlabel("t (ms)")
-plt.ylabel("V (mV)")
-
-time = np.arange(0, 10, dt)
-plt.figure()
-plt.title("Hidden Layer [gs_ps] 0->0")
-plt.plot(time, n.neurons[1][0].list_gs_ps_1[:math.ceil(10/dt)])
-plt.xlabel("t (ms)")
-plt.ylabel("V (mV)")
-
-time = np.arange(0, 10, dt)
-plt.figure()
-plt.title("Hidden Layer [gs_ps]  1->0")
-plt.plot(time, n.neurons[1][0].list_gs_ps_2[:math.ceil(10/dt)])
-plt.xlabel("t (ms)")
-plt.ylabel("V (mV)")
 
 
 plt.show()

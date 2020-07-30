@@ -13,7 +13,7 @@ rm_gs = 0.05
 Rm_Ie = 25			# [mV]
 V_trhs = -54			# [mV]
 dt = 0.05			# [mS]  
-T = 100			# [mS] total time of analyses
+T = 2000			# [mS] total time of analyses
 Pmax = 1 
 V_reset = -80 
 
@@ -73,10 +73,10 @@ T: float
 
 
 class LIF:
-	def __init__(self, T, dt, In = False):
+	def __init__(self, T, dt, Exc = True):
 
 		# setting constants
-		self.Es = 0 if In else -80  # [mV]	
+		self.Es = 0 if Exc else -80  # [mV]
 		
 		self.steps = math.ceil(T/dt)
 		self.v = np.zeros(self.steps) 				# voltage historic 
@@ -104,7 +104,7 @@ class LIF:
 		if self.v[i] >= V_trhs: self.synapse.add_spike(self.actualTime) 
 
 	def euler(self, Ps_sum, i):
-		dv = (El - self.v[i - 1] + Ps_sum * rm_gs * (self.v[i - 1] - self.Es) + Rm_Ie) / tau_m * dt
+		dv = (El - self.v[i - 1] - Ps_sum * rm_gs * (self.v[i - 1] - self.Es) + Rm_Ie) / tau_m * dt
 		self.v[i] = dv + self.v[i - 1]
 
 
@@ -118,11 +118,11 @@ class LIF:
 
 
 	def fu(self, v, Ps_sum):
-		return (El - v + Ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
+		return (El - v - Ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
 
 	def Ps_sum(self):
 		ps_sum = 0
-		for ti in self.synapse.time:
+		for ti in self.pre_neuron.synapse.time:
 			ps_sum += self.Ps(self.actualTime - ti)
 
 		return ps_sum
@@ -134,29 +134,31 @@ class LIF:
 if __name__ == '__main__':
 	steps = math.ceil(T/dt)
 	
-	n1 = LIF(T, dt	)
+	n1 = LIF(T, dt)
 	n2 = LIF(T, dt)
 
 	neurons = [n1, n2]
 	n1.pre_neuron = neurons[1]
 	n2.pre_neuron = neurons[0]
 
-	n1.v[0] = El 
+	n1.v[0] = El + Rm_Ie
 	n2.v[0] = El 
 
-	# spikes = dirac(t).timeV 
+	# RUN
 	for i in range(1, steps):
 		for neuron in neurons: 
 			neuron.step(i) 
 
+
+	# PLOT RESULTS
 	time = np.arange(0, T, dt)
 	plt.figure()
-	plt.subplot(3, 1, 1)
-	plt.plot(time, n1.v) 
+	plt.subplot(2, 1, 1)
+	plt.plot(time, n1.v)
 	plt.xlabel("t (ms)")
 	plt.ylabel("V1 (mV)")
 
-	plt.subplot(3, 1, 3)
+	plt.subplot(2, 1, 2)
 	plt.plot(time, n2.v)
 	plt.xlabel("t (ms)")
 	plt.ylabel("V2 (mV)")
