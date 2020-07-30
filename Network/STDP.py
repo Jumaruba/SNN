@@ -17,7 +17,7 @@ El = -70                # [mV]
 rm = 0.05
 V_trhs = -54            # [mV]
 dt = 0.05               # [mS]
-T = 500                 # [mS] total time of analyses
+T = 1000                 # [mS] total time of analyses
 Pmax = 1
 V_reset = -80
 
@@ -47,7 +47,7 @@ Maximum number of neurons to be analyzed
 
 class Synapse:
 
-    def __init__(self, max_len=20):
+    def __init__(self, max_len=100):
         self.max_len = max_len
         self.time = []
         self.lenTime = 0
@@ -96,7 +96,7 @@ class LIF:
         # setting constants
         self.Es = 0 if Exc else -80  # [mV]
 
-        self.Rm_Ie = 100                        # [mV]
+        self.Rm_Ie = 25                        # [mV]
         self.steps = math.ceil(T / dt)
         self.v = np.zeros(self.steps)           # voltage historic
         self.v[0] = El
@@ -117,6 +117,8 @@ class LIF:
         # Synapse
         self.max_spikes_anal = 10               # max spikes to be considered by the algorithm to calculate Ps
         self.synapse = Synapse(self.max_spikes_anal)
+        self.synaptic_components = []
+        self.sum_syn_comps = 0
 
     def step(self, i):
         self.actualTime += dt
@@ -153,18 +155,21 @@ class LIF:
             if i == 0: self.list_gs_ps_1.append(self.gs_list[0])
             if i == 1: self.list_gs_ps_2.append(self.gs_list[1])
 
+            # Upper and lower bound
             if self.gs_list[i] > 1:
                 self.gs_list[i] = 1
             if self.gs_list[i] < 0:
                 self.gs_list[i] = 0
 
+            self.gs_list[i] *= self.ps
+            self.synaptic_components.append(self.gs_list[i] * neuron.Es)
 
-
-        self.gs = sum(self.gs_list)
-        self.gs_ps = self.gs * self.ps
+        self.gs_ps = sum(self.gs_list)
+        self.sum_syn_comps = sum(self.synaptic_components)
+        self.synaptic_components = []
 
     def euler(self, i):
-        dv = (El - self.v[i - 1] - rm * self.gs_ps * (self.v[i - 1] - self.Es) + self.Rm_Ie) / tau_m * dt
+        dv = self.fu(self.v[i - 1]) * dt
         self.v[i] = dv + self.v[i - 1]
 
     # to fix this one
@@ -178,7 +183,7 @@ class LIF:
         self.v[i] = self.v[i - 1] + dv
 
     def fu(self, v):
-        return (El - v - rm * self.gs_ps * (v - self.Es) + self.Rm_Ie) / tau_m
+        return (El - v - rm * self.gs_ps * v + self.sum_syn_comps + self.Rm_Ie) / tau_m
 
     def Ps_sum(self, neuron):
         ps_sum = 0
@@ -199,7 +204,7 @@ class Network:
     def __init__(self, layers):
         self.layers = layers
         self.neurons = []
-        self.choice = [1, 1, False]
+        self.choice = [True, False]
         for i, lay in enumerate(layers):
             layer = []
             for j in range(lay):
@@ -223,7 +228,7 @@ class Network:
                     neuron.step(i)
 
 
-n = Network([2, 3, 1])
+n = Network([1, 1, 1])
 n.run()
 
 time = np.arange(0, T, dt)
