@@ -113,7 +113,7 @@ class LIF:
 
 if __name__ == '__main__':
 
-#   EXCITATORIO -------------------
+#   INIBITORIO -------------------
     n1 = LIF(False)
     n2 = LIF(False)
 
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     plt.ylabel("V (mV)")
     plt.show()
 
-#   INIBITORIOS -------------------------------
+#   EXCITATORIO -------------------------------
     n1 = LIF()
     n2 = LIF()
 
