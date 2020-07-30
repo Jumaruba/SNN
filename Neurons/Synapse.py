@@ -8,7 +8,7 @@ global tau_m, El, rm_gs, Rm_Ie, Es, V_trhs, dt, T, Pmax
 tau_m = 20                      # [ms] How fast all the action happens
 tau_s = 10                      # [ms] Peak lag from the beginning of the curve
 El = -70                        # [mV] Initial voltage
-rm_gs = 0.2                     # [mA] Resistence * Synapse conductance
+rm_gs = 0.5                     # [mA] Resistence * Synapse conductance
 Rm_Ie = 25                      # [mV] Resistence * Externa current
 V_trhs = -54                    # [mV] Threshold voltage
 dt = 0.05                       # [mS] Step time
@@ -121,8 +121,8 @@ class LIF:
 
 if __name__ == '__main__':
 
-    n1 = LIF(False)
-    n2 = LIF(True)
+    n1 = LIF(True)
+    n2 = LIF(False)
     n2.Rm_Ie = 0
 
     neurons = [n1, n2]
