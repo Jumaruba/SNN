@@ -11,8 +11,8 @@ El = -70                        # [mV] Initial voltage
 rm_gs = 0.05                    # [mA] Resistence * Synapse conductance
 Rm_Ie = 25                      # [mV] Resistence * Externa current
 V_trhs = -54                    # [mV] Threshold voltage
-dt = 0.05                       # [mS] Step time
-T = 2000                        # [mS] total time of analyses
+dt = 0.05                       # [ms] Step time
+T = 4000                        # [mS] total time of analyses
 Pmax = 1                        # Max value the Ps can reach
 V_reset = -80                   # [mV] Reset voltage
 
@@ -111,7 +111,7 @@ class LIF:
 
     def Ps(self):
         self.ps_sum = 0
-        for ti in self.spikes.time_spikes:
+        for ti in self.pre_neuron.spikes.time_spikes:
             t = self.actualTime - ti
             self.ps_sum += Pmax * t / tau_s * np.exp(1 - t / tau_s)         # apply ps formula for each spike
 
@@ -119,15 +119,16 @@ class LIF:
 
 if __name__ == '__main__':
 
-    n1 = LIF()
-    n2 = LIF()
+#   EXCITATORIO -------------------
+    n1 = LIF(False)
+    n2 = LIF(False)
 
     neurons = [n1, n2]
     n1.pre_neuron = neurons[1]
     n2.pre_neuron = neurons[0]
 
-    n1.v[0] = El + Rm_Ie
-    n2.v[0] = El
+    n1.v[0] = El
+    n2.v[0] = -54
 
     # RUN
     for i in range(1, steps):
@@ -135,15 +136,40 @@ if __name__ == '__main__':
             neuron.step(i)
 
     # PLOT RESULTS
-    time = np.arange(0, T, dt)
-    plt.figure()
-    plt.subplot(2, 1, 1)
-    plt.plot(time, n1.v)
-    plt.xlabel("t (ms)")
-    plt.ylabel("V1 (mV)")
+    begin = 3800
+    begin_step = math.ceil(begin/dt)
+    time = np.arange(begin, T, dt)
 
-    plt.subplot(2, 1, 2)
-    plt.plot(time, n2.v)
+
+    plt.title("Inhibitory neurons")
+    plt.plot(time, n1.v[begin_step:], color='b', label="neuron 1")
+    plt.plot(time, n2.v[begin_step:], color='r', label="neuron 2")
+    plt.legend(loc="upper left")
     plt.xlabel("t (ms)")
-    plt.ylabel("V2 (mV)")
+    plt.ylabel("V (mV)")
     plt.show()
+
+#   INIBITORIOS -------------------------------
+    n1 = LIF()
+    n2 = LIF()
+
+    neurons = [n1, n2]
+    n1.pre_neuron = neurons[1]
+    n2.pre_neuron = neurons[0]
+
+    n1.v[0] = El
+    n2.v[0] = -54
+
+    # RUN
+    for i in range(1, steps):
+        for neuron in neurons:
+            neuron.step(i)
+
+    plt.title("Excitatory neurons")
+    plt.plot(time, n1.v[begin_step:], color='b', label="neuron 1")
+    plt.plot(time, n2.v[begin_step:], color='r', label="neuron 2")
+    plt.xlabel("t (ms)")
+    plt.ylabel("V (mV)")
+    plt.legend(loc="upper left")
+    plt.show()
+
