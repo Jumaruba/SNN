@@ -8,11 +8,12 @@ global tau_m, El, rm_gs, Rm_Ie, Es, V_trhs, dt, T, Pmax
 tau_m = 20                      # [ms] How fast all the action happens
 tau_s = 10                      # [ms] Peak lag from the beginning of the curve
 El = -70                        # [mV] Initial voltage
-rm_gs = 0.05                    # [mA] Resistence * Synapse conductance
+rm_gs = 0.2                     # [mA] Resistence * Synapse conductance
 Rm_Ie = 25                      # [mV] Resistence * Externa current
 V_trhs = -54                    # [mV] Threshold voltage
 dt = 0.05                       # [ms] Step time
 T = 4000                        # [mS] total time of analyses
+
 Pmax = 1                        # Max value the Ps can reach
 V_reset = -80                   # [mV] Reset voltage
 
@@ -66,10 +67,12 @@ class LIF:
     def __init__(self, Exc=True):
 
         self.Es = 0 if Exc else -80
+        self.Rm_Ie = 25                             # [mV] Resistance * External current
 
         self.v = np.zeros(steps)                    # Voltage historic so as to plot results
         self.actualTime = dt
         self.pre_neuron = None                      # Pre-synaptic neurons connected to it
+        self.componente_sinaptica = 0
 
         max_spikes_anal = 100                       # Max spikes to be considered by the algorithm to calculate Ps
         self.spikes = Spikes(max_spikes_anal)
@@ -93,7 +96,6 @@ class LIF:
         if self.v[i] >= V_trhs:
             self.spikes.add_spike(self.actualTime)
 
-
     def euler(self, i):
         dv = self.fv(self.v[i - 1]) + Rm_Ie / tau_m * dt
         self.v[i] = dv + self.v[i - 1]
@@ -107,21 +109,24 @@ class LIF:
         self.v[i] = self.v[i - 1] + dv
 
     def fv(self, v):
-        return (El - v - self.ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
+        return (El - v - self.ps_sum * rm_gs * v + self.componente_sinaptica + self.Rm_Ie) / tau_m
 
     def Ps(self):
         self.ps_sum = 0
         for ti in self.pre_neuron.spikes.time_spikes:
             t = self.actualTime - ti
             self.ps_sum += Pmax * t / tau_s * np.exp(1 - t / tau_s)         # apply ps formula for each spike
+        self.componente_sinaptica = self.ps_sum * rm_gs * self.pre_neuron.Es
 
 
 
 if __name__ == '__main__':
 
-#   EXCITATORIO -------------------
+
+#   EXCITATORIO -------------------------------
     n1 = LIF(False)
     n2 = LIF(False)
+
 
     neurons = [n1, n2]
     n1.pre_neuron = neurons[1]

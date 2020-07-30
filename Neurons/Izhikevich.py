@@ -71,12 +71,11 @@ if __name__ == '__main__':
     n = Izhi()
     n1 = n.create_copy()
 
-    """
     time = 500
     dt = 0.5
     steps = math.ceil(time / dt)
-    # I = [0 if 200 / dt <= i <= 300 / dt else 10 for i in range(steps)]
-    I = 10*np.ones(math.ceil(time / dt))
+    I = [0 if 200 / dt <= i <= 300 / dt else 10 for i in range(steps)]
+    #I = 10*np.ones(math.ceil(time / dt))
     v = n.stimulation(time, I, dt)
     plot(time, dt, v, I)
-    """
+
