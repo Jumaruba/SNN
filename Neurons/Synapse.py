@@ -68,52 +68,53 @@ class LIF:
         self.Es = 0 if Exc else -80
 
         self.v = np.zeros(steps)                    # Voltage historic so as to plot results
-
         self.actualTime = dt
         self.pre_neuron = None                      # Pre-synaptic neurons connected to it
 
         max_spikes_anal = 100                       # Max spikes to be considered by the algorithm to calculate Ps
         self.spikes = Spikes(max_spikes_anal)
 
+        self.ps_sum = 0
+
     def step(self, i):
         self.actualTime += dt
 
-        Ps_sum = self.Ps_sum()
+        self.Ps()
 
-        if Ps_sum > Pmax: Ps_sum = Pmax
+        if self.ps_sum > Pmax:
+            self.ps_sum = Pmax
 
         if self.v[i - 1] > V_trhs:
             self.v[i - 1] = 0  # setting last voltage to spike value
             self.v[i] = V_reset
         else:
-            self.rk4(Ps_sum, i)
+            self.rk4(i)
 
-        if self.v[i] >= V_trhs: self.spikes.add_spike(self.actualTime)
+        if self.v[i] >= V_trhs:
+            self.spikes.add_spike(self.actualTime)
 
-    def euler(self, Ps_sum, i):
-        dv = (El - self.v[i - 1] - Ps_sum * rm_gs * (self.v[i - 1] - self.Es) + Rm_Ie) / tau_m * dt
+
+    def euler(self, i):
+        dv = self.fv(self.v[i - 1]) + Rm_Ie / tau_m * dt
         self.v[i] = dv + self.v[i - 1]
 
-    def rk4(self, Ps_sum, i):
-        dv1 = self.fu(self.v[i - 1], Ps_sum) * dt
-        dv2 = self.fu(self.v[i - 1] + dv1 * 0.5, Ps_sum) * dt
-        dv3 = self.fu(self.v[i - 1] + dv2 * 0.5, Ps_sum) * dt
-        dv4 = self.fu(self.v[i - 1] + dv3, Ps_sum) * dt
+    def rk4(self, i):
+        dv1 = self.fv(self.v[i - 1]) * dt
+        dv2 = self.fv(self.v[i - 1] + dv1 * 0.5) * dt
+        dv3 = self.fv(self.v[i - 1] + dv2 * 0.5) * dt
+        dv4 = self.fv(self.v[i - 1] + dv3) * dt
         dv = 1 / 6 * (dv1 + dv2 * 2 + dv3 * 2 + dv4)
         self.v[i] = self.v[i - 1] + dv
 
-    def fu(self, v, Ps_sum):
-        return (El - v - Ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
+    def fv(self, v):
+        return (El - v - self.ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
 
-    def Ps_sum(self):
-        ps_sum = 0
+    def Ps(self):
+        self.ps_sum = 0
         for ti in self.spikes.time_spikes:
-            ps_sum += self.Ps(self.actualTime - ti)
+            t = self.actualTime - ti
+            self.ps_sum += Pmax * t / tau_s * np.exp(1 - t / tau_s)         # apply ps formula for each spike
 
-        return ps_sum
-
-    def Ps(self, t):
-        return Pmax * t / tau_s * np.exp(1 - t / tau_s)
 
 
 if __name__ == '__main__':
@@ -133,7 +134,7 @@ if __name__ == '__main__':
         for neuron in neurons:
             neuron.step(i)
 
-        # PLOT RESULTS
+    # PLOT RESULTS
     time = np.arange(0, T, dt)
     plt.figure()
     plt.subplot(2, 1, 1)
