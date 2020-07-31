@@ -14,10 +14,10 @@ global tau_m, El, rm_gs, Es, V_trhs, dt, T, Pmax
 tau_m = 30              # [ms] How fast all the action happens
 tau_s = 10              # [ms]
 El = -70                # [mV]
-rm = 0.1
+rm = 0.1                # [mOhm] Resistence of the synapse 
 V_trhs = -54            # [mV]
-dt = 0.05               # [mS]
-T = 1000                 # [mS] total time of analyses
+dt = 0.05               # [ms]
+T = 1000                # [ms] total time of analyses
 Pmax = 1
 V_reset = -80
 
@@ -29,6 +29,8 @@ A_neg = 0.02
 tau_plus = 20           # [mS]
 tau_neg = 100           # [mS]
 
+
+steps = math.ceil(T/dt)
 '''A class to keep track of the spikes transmited by a synapse 
 
 Parameters
@@ -61,6 +63,8 @@ class Synapse:
         self.lenTime += 1
         self.last_spike_checked = False
 
+    def get_last_spike(self):
+        return self.time[self.lenTime-1]
 
     # Checks if the last spike was at the specific time given
     def previous_spike_time(self, time):
@@ -93,39 +97,39 @@ T: float
 
 
 class LIF:
-    def __init__(self, T, dt, Exc=False):
+    def __init__(self, T, dt, Exc=True):
 
+        self.Es = 0 if Exc else -80             # [mV]
+ 
         # setting constants
-        self.Es = 0 if Exc else -80  # [mV]
+        self.actualTime = dt
+
 
         self.Rm_Ie = 100                        # [mV]
-        self.steps = math.ceil(T / dt)
-        self.v = np.zeros(self.steps)           # voltage historic
+
+        self.v = np.zeros(steps)            # voltage historic
         self.v[0] = El
+
         self.pre_neuron = []                    # pre-synaptic neurons connected to it
-        self.actualTime = dt
-        self.ps = 0
+        
 
         # STDP
         self.gs_list = []                       # list weights of pre-sytnaptic connections
         self.gs_ps = 0                          # ps * gs
-        self.gs_ps_total = 0
+
 
         # to be deleted
         self.gs_list2 = [0]
 
         # Synapse
-        self.max_spikes_anal = 10               # max spikes to be considered by the algorithm to calculate Ps
-        self.synapse = Synapse(self.max_spikes_anal)
-        self.synaptic_components = []
-        self.sum_syn_comps = 0
+        self.synapse = Synapse()
+
 
         self.last_spike = 0
 
     def step(self, i):
         self.actualTime += dt
-        print("i=", i)
-        print()
+
         if self.v[i - 1] > V_trhs:
             self.v[i - 1] = 0                   # setting last voltage to spike value
             self.v[i] = V_reset
@@ -137,11 +141,11 @@ class LIF:
             self.last_spike = self.actualTime
 
         self.STDP()  # udpate all the weights
-        # if i == 4: exit(0)
+
 
     def STDP(self):
         gs_list2 = 0        # to be deleted
-        self.gs_ps_total = 0
+        self.gs_ps = 0
 
         # update the value of gs for each neuron
         for i, neuron in enumerate(self.pre_neuron):
@@ -152,38 +156,26 @@ class LIF:
                 if neuron.synapse.last_spike_checked: pass
 
                 neuron.synapse.last_spike_checked = True
-                delta_t = self.last_spike - neuron.synapse.time[self.synapse.lenTime-1]
-                f_t += A_plus * np.exp(delta_t / tau_plus) if delta_t > 0 else -A_neg * np.exp(delta_t / tau_neg)
+                delta_t = self.last_spike - neuron.synapse.get_last_spike()
+                f_t += A_plus * np.exp(delta_t / tau_plus) if delta_t < 0 else -A_neg * np.exp(-delta_t / tau_neg)
 
 
-
-            print("F_T", f_t)
             # calculates the ps
-            self.ps = self.Ps_sum(neuron)
-            print("PS:", self.ps)
+            ps = self.Ps(neuron)
+
 
             self.gs_list[i] += gsMax * f_t
-            print("GS:", self.gs_list[i])
 
             # Upper and lower bound
-            if self.gs_list[i] > 1:
-                self.gs_list[i] = 1
-            if self.gs_list[i] < 0:
-                self.gs_list[i] = 0
+            if self.gs_list[i] > gsMax: self.gs_list[i] = gsMax 
+            if ps > Pmax: ps = Pmax 
 
             gs_list2 = self.gs_list[i]      # to be deleted
 
-            self.gs_ps_total += self.ps * self.gs_list[i]
-            print("GS*PS", self.gs_list[i])
-
-            self.gs_ps = self.ps * self.gs_list[i]
-            self.synaptic_components.append(self.gs_ps * neuron.Es)
-
-
+            self.gs_ps += ps * self.gs_list[i]
 
         self.gs_list2.append(gs_list2)
-        self.sum_syn_comps = sum(self.synaptic_components)
-        self.synaptic_components = []
+        
 
     def euler(self, i):
         dv = self.fu(self.v[i - 1]) * dt
@@ -200,21 +192,19 @@ class LIF:
         self.v[i] = self.v[i - 1] + dv
 
     def fu(self, v):
-        return (El - v - rm * self.gs_ps_total * v + self.sum_syn_comps + self.Rm_Ie) / tau_m
-
-    def Ps_sum(self, neuron):
-        ps_sum = 0
-        for ti in neuron.synapse.time:
-            ps_sum += self.Ps(self.actualTime - ti)
-
-        return ps_sum
+        return (El - v - rm * self.gs_ps * (v- self.Es) + self.Rm_Ie) / tau_m
 
     def add_pre_neuron(self, neuron):
         self.pre_neuron.append(neuron)
         self.gs_list.append(random.random())  # give a weight for the connection
 
-    def Ps(self, t):
-        return Pmax * t / tau_s * np.exp(1 - t / tau_s)
+    def Ps(self, neuron):
+        ps_sum = 0
+        for ti in neuron.synapse.time:
+            t = self.actualTime - ti
+            ps_sum += Pmax * t / tau_s * np.exp(1 - t / tau_s)         # apply ps formula for each spike
+
+        return ps_sum 
 
 
 class Network:
@@ -225,9 +215,7 @@ class Network:
         for i, lay in enumerate(layers):
             layer = []
             for j in range(lay):
-                type = random.choice(self.choice)
-                neuron = LIF(T, dt, type)
-                print(type)
+                neuron = LIF(T, dt, True)
                 if i != 0:
                     neuron.Rm_Ie = 0
                     for pre_n in self.neurons[i - 1]:
@@ -288,7 +276,7 @@ plt.title("Normalized")
 gs = n.neurons[1][0].gs_list2
 n1 = n.neurons[0][0].v
 n2 = n.neurons[1][0].v
-print(gs)
+
 plt.plot(time, (gs - np.min(gs))/(np.max(gs) - np.min(gs)))
 plt.plot(time, (n1 - np.min(n1))/(np.max(n1) - np.min(n1)))
 plt.plot(time, (n2 - np.min(n2))/(np.max(n2) - np.min(n2)))
