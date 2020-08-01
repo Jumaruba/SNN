@@ -1,4 +1,3 @@
-from Neuron import Neuron as Neuron_
 
 import math
 import numpy as np
@@ -62,7 +61,6 @@ class LIF:
         self.Es = 0 if Exc else -80
 
         self.v = np.zeros(steps)                    # Voltage historic so as to plot results
-        self.actualTime = dt
         self.pre_neuron = None                      # Pre-synaptic neurons connected to it
 
         max_spikes_anal = 100                       # Max spikes to be considered by the algorithm to calculate Ps
@@ -70,10 +68,9 @@ class LIF:
 
         self.ps_sum = 0
 
-    def step(self, i):
-        self.actualTime += dt
+    def step(self, i, t):
 
-        self.Ps()
+        self.Ps(t)
 
         if self.ps_sum > Pmax:
             self.ps_sum = Pmax
@@ -85,7 +82,7 @@ class LIF:
             self.rk4(i)
 
         if self.v[i] >= V_trhs:
-            self.spikes.add_spike(self.actualTime)
+            self.spikes.add_spike(t)
 
 
     def euler(self, i):
@@ -103,11 +100,11 @@ class LIF:
     def fv(self, v):
         return (El - v - self.ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
 
-    def Ps(self):
+    def Ps(self,t):
         self.ps_sum = 0
         for ti in self.pre_neuron.spikes.time_spikes:
-            t = self.actualTime - ti
-            self.ps_sum += Pmax * t / tau_s * np.exp(1 - t / tau_s)         # apply ps formula for each spike
+            delta_t = t - ti
+            self.ps_sum += Pmax * t / tau_s * np.exp(1 - delta_t / tau_s)         # apply ps formula for each spike
 
 
 
@@ -127,7 +124,7 @@ if __name__ == '__main__':
     # RUN
     for i in range(1, steps):
         for neuron in neurons:
-            neuron.step(i)
+            neuron.step(i, i*dt)
 
     # PLOT RESULTS
     begin = 3800
