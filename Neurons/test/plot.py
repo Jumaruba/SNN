@@ -18,6 +18,5 @@ def plot(neuron, time, dt, I, method):
     plt.title("Single neuron stimulation")
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [mv]")
-    plt.savefig("Fast spiking")
     plt.show()
 
