@@ -1,19 +1,17 @@
-import math
-import numpy as np
-
 
 '''Izhikevich neuron 
 
 font: https://www.izhikevich.org/publications/spikes.pdf 
 '''
 
-class Izhi():
+class IZHI():
     def __init__(self):
         self.a = .1            
         self.b = .2
         self.c = -65
         self.d = 8
 
+        self.thrs = 30 
         self.v = -65
         self.u = -14
 
@@ -38,7 +36,7 @@ class Izhi():
         if method != 1 and method != 0:
             print("Invalid method\n0 - EULER\n1 - RK4\n")
 
-        if self.v >= 30:
+        if self.v >= self.thrs:
             self.v = self.c
             self.u += self.d
         else: 

@@ -1,6 +1,4 @@
-import numpy as np
-import math 
-import matplotlib.pyplot as plt
+
 
 # constants http://www.math.pitt.edu/~bdoiron/assets/ermentrout-and-terman-ch-1.pdf
 # paper https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1392413/pdf/jphysiol01442-0106.pdf
