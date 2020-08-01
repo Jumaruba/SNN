@@ -60,7 +60,7 @@ class LIF:
 
         self.Es = 0 if Exc else -80
 
-        self.v = np.zeros(steps)                    # Voltage historic so as to plot results
+        self.v = El 
         self.pre_neuron = None                      # Pre-synaptic neurons connected to it
 
         max_spikes_anal = 100                       # Max spikes to be considered by the algorithm to calculate Ps
@@ -75,27 +75,27 @@ class LIF:
         if self.ps_sum > Pmax:
             self.ps_sum = Pmax
 
-        if self.v[i - 1] > V_trhs:
-            self.v[i - 1] = 0  # setting last voltage to spike value
-            self.v[i] = V_reset
+        if self.v > V_trhs:
+            self.v = V_reset
         else:
-            self.rk4(i)
+            self.euler(i)
 
-        if self.v[i] >= V_trhs:
+        if self.v >= V_trhs:
             self.spikes.add_spike(t)
+            self.v = 0
 
 
     def euler(self, i):
-        dv = self.fv(self.v[i - 1])* dt
-        self.v[i] = dv + self.v[i - 1]
+        dv = self.fv(self.v)* dt
+        self.v += dv 
 
     def rk4(self, i):
-        dv1 = self.fv(self.v[i - 1]) * dt
-        dv2 = self.fv(self.v[i - 1] + dv1 * 0.5) * dt
-        dv3 = self.fv(self.v[i - 1] + dv2 * 0.5) * dt
-        dv4 = self.fv(self.v[i - 1] + dv3) * dt
+        dv1 = self.fv(self.v) * dt
+        dv2 = self.fv(self.v + dv1 * 0.5) * dt
+        dv3 = self.fv(self.v + dv2 * 0.5) * dt
+        dv4 = self.fv(self.v + dv3) * dt
         dv = 1 / 6 * (dv1 + dv2 * 2 + dv3 * 2 + dv4)
-        self.v[i] = self.v[i - 1] + dv
+        self.v = self.v + dv
 
     def fv(self, v):
         return (El - v - self.ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
@@ -111,34 +111,41 @@ class LIF:
 if __name__ == '__main__':
 
 #   INIBITORIO -------------------
-    n1 = LIF(False)
-    n2 = LIF(False)
+    # n1 = LIF(False)
+    # n2 = LIF(False)
 
-    neurons = [n1, n2]
-    n1.pre_neuron = neurons[1]
-    n2.pre_neuron = neurons[0]
+    # neurons = [n1, n2]
+    # n1.pre_neuron = neurons[1]
+    # n2.pre_neuron = neurons[0]
 
-    n1.v[0] = El
-    n2.v[0] = -54
+    # n1.v = El
+    # n2.v = -54
 
-    # RUN
-    for i in range(1, steps):
-        for neuron in neurons:
-            neuron.step(i, i*dt)
+    # v1 = np.zeros(steps)
+    # v2 = np.zeros(steps)
 
-    # PLOT RESULTS
-    begin = 3800
-    begin_step = math.ceil(begin/dt)
-    time = np.arange(begin, T, dt)
+    # # RUN
+    # for i in range(1, steps):
+    #     for j,neuron in enumerate(neurons):
+    #         neuron.step(i, i*dt)
+    #         if j == 0: 
+    #             v1[i] = neuron.v 
+    #             v2[i] = neuron.v 
+            
+
+    # # PLOT RESULTS
+    # begin = 3800
+    # begin_step = math.ceil(begin/dt)
+    # time = np.arange(begin, T, dt)
 
 
-    plt.title("Inhibitory neurons")
-    plt.plot(time, n1.v[begin_step:], color='b', label="neuron 1")
-    plt.plot(time, n2.v[begin_step:], color='r', label="neuron 2")
-    plt.legend(loc="upper left")
-    plt.xlabel("t (ms)")
-    plt.ylabel("V (mV)")
-    plt.show()
+    # plt.title("Inhibitory neurons")
+    # plt.plot(time, v1[begin_step:], color='b', label="neuron 1")
+    # plt.plot(time, v2[begin_step:], color='r', label="neuron 2")
+    # plt.legend(loc="upper left")
+    # plt.xlabel("t (ms)")
+    # plt.ylabel("V (mV)")
+    # plt.show()
 
 #   EXCITATORIO -------------------------------
     n1 = LIF()
@@ -148,17 +155,29 @@ if __name__ == '__main__':
     n1.pre_neuron = neurons[1]
     n2.pre_neuron = neurons[0]
 
-    n1.v[0] = El
-    n2.v[0] = -54
+    n1.v = El
+    n2.v = -54
+
+    v3 = np.zeros(steps)
+    v4 = np.zeros(steps)
 
     # RUN
     for i in range(1, steps):
-        for neuron in neurons:
-            neuron.step(i)
+        for j,neuron in enumerate(neurons):
+            neuron.step(i, i*dt)
+            if j == 0: 
+                v3[i] = neuron.v 
+            if j == 1: 
+                v4[i] = neuron.v 
+
+    begin = 3800
+    begin_step = math.ceil(begin/dt)
+    time = np.arange(begin, T, dt)
+
 
     plt.title("Excitatory neurons")
-    plt.plot(time, n1.v[begin_step:], color='b', label="neuron 1")
-    plt.plot(time, n2.v[begin_step:], color='r', label="neuron 2")
+    plt.plot(time, v3[begin_step:], color='b', label="neuron 1")
+    plt.plot(time, v4[begin_step:], color='r', label="neuron 2")
     plt.xlabel("t (ms)")
     plt.ylabel("V (mV)")
     plt.legend(loc="upper left")
