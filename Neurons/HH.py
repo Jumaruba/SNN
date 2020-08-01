@@ -23,34 +23,84 @@ class HH():
         self.n = self.inf_n(self.restV)
         self.m = self.inf_m(self.restV) 
         self.h = self.inf_h(self.restV)
+        self.v = self.restV 
         
-    def stimulation(self, tmax, I, dt):
-        steps = math.ceil(time/dt)
-        v = np.zeros(steps)
-        v[0] = self.restV 
+    def step(self, dt, I, method=0):
+        
+        # Conductance
+        NaCond = self.m**3*self.h*self.gNa 
+        KCond  = self.n**4*self.gK 
+        gCond  = self.gl 
 
-        for t in range(steps-1): 
-            # Conductances 
-            NaCond = self.m**3*self.h*self.gNa 
-            KCond  = self.n**4*self.gK 
-            gCond  = self.gl 
+        # Current 
+        INa = NaCond*(self.v-self.VNa) 
+        IK  = KCond *(self.v-self.VK)
+        Il  = gCond *(self.v-self.Vl)
 
-            # Corrent 
-            INa = NaCond*(v[t]-self.VNa) 
-            IK  = KCond *(v[t]-self.VK)
-            Il  = gCond *(v[t]-self.Vl)
+        if method == 0: 
+            self.solve_euler(dt, I, INa, IK, Il)
+        if method == 1: 
+            self.solve_rk4(dt, I, INa, IK, Il)
 
-            # Update membrane voltage 
-            dv = (I[t] - INa - IK - Il)*dt/self.Cm 
-            v[t+1] = v[t] + dv
+    # EULER --------------------------
 
-            # Update Channels
-            self.n += (self.alpha_n(v[t])*(1-self.n)-self.beta_n(v[t])*self.n)*dt
-            self.m += (self.alpha_m(v[t])*(1-self.m)-self.beta_m(v[t])*self.m)*dt
-            self.h += (self.alpha_h(v[t])*(1-self.h)-self.beta_h(v[t])*self.h)*dt
+    def solve_euler(self,dt,I, INa, IK, Il):
+        dv = (I - INa - IK - Il)*dt/self.Cm 
+        self.v += dv
 
-        return v
+        self.n += (self.alpha_n(self.v)*(1-self.n)-self.beta_n(self.v)*self.n)*dt
+        self.m += (self.alpha_m(self.v)*(1-self.m)-self.beta_m(self.v)*self.m)*dt
+        self.h += (self.alpha_h(self.v)*(1-self.h)-self.beta_h(self.v)*self.h)*dt
 
+
+    # RK4 ----------------------------- 
+
+    def solve_rk4(self, dt, I, INa, IK, Il):
+        dv = self.getDv(I, dt, INa, IK, Il)
+        self.v += dv 
+           
+        self.n += self.getDn(I, dt)
+        self.m += self.getDm(I, dt)
+        self.h += self.getDh(I, dt)
+
+    def getDv(self, I, dt, INa, IK, Il):
+        dv1 = (I - INa - IK - Il)/self.Cm * dt 
+        dv2 = (I - INa - IK - Il + dv1*0.5)/self.Cm * dt 
+        dv3 = (I - INa - IK - Il + dv2*0.5)/self.Cm * dt 
+        dv4 = (I - INa - IK - Il + dv3)/self.Cm * dt 
+        dv  = 1/6*(dv1 + dv2*2 + dv3*2 + dv4) 
+        
+        return dv 
+
+    def getDn(self, I, dt): 
+        dn1 = (self.alpha_n(self.v)*(1-self.n)-self.beta_n(self.v)*self.n)*dt
+        dn2 = (self.alpha_n(self.v)*(1-(self.n + dn1*0.5))-self.beta_n(self.v)*(self.n+dn1*0.5))*dt
+        dn3 = (self.alpha_n(self.v)*(1-(self.n + dn2*0.5))-self.beta_n(self.v)*(self.n+dn2*0.5))*dt
+        dn4 = (self.alpha_n(self.v)*(1-(self.n + dn3))-self.beta_n(self.v)*(self.n+dn3))*dt
+        dn = 1/6*(dn1 + dn2*2 + dn3*2 + dn4) 
+        
+        return dn 
+
+    def getDm(self, I, dt):
+        dm1 = (self.alpha_m(self.v)*(1-self.m)-self.beta_m(self.v)*self.m)*dt
+        dm2 = (self.alpha_m(self.v)*(1-(self.m + dm1*0.5))-self.beta_m(self.v)*(self.m + dm1*0.5))*dt
+        dm3 = (self.alpha_m(self.v)*(1-(self.m + dm2*0.5))-self.beta_m(self.v)*(self.m + dm2*0.5))*dt
+        dm4 = (self.alpha_m(self.v)*(1-(self.m + dm3))-self.beta_m(self.v)*(self.m + dm3))*dt
+        dm = 1/6*(dm1 + dm2*2 + dm3*2 + dm4) 
+
+        return dm 
+
+    def getDh(self, I, dt):
+        dh1 = (self.alpha_h(self.v)*(1-self.h)-self.beta_h(self.v)*self.h)*dt
+        dh2 = (self.alpha_h(self.v)*(1-(self.h + dh1*0.5))-self.beta_h(self.v)*(self.h + dh1*0.5))*dt
+        dh3 = (self.alpha_h(self.v)*(1-(self.h + dh2*0.5))-self.beta_h(self.v)*(self.h + dh2*0.5))*dt
+        dh4 = (self.alpha_h(self.v)*(1-(self.h + dh3))-self.beta_h(self.v)*(self.h + dh3))*dt
+        dh = 1/6*(dh1 + dh2*2 + dh3*2 + dh4)
+
+        return dh    
+
+    # GATES ---------------------- 
+         
     # Gate n 
     def alpha_n(self, v):
         return 0.01 * (v + 55) / (1 - np.exp(-(v + 55) * 0.1) )
@@ -77,38 +127,3 @@ class HH():
 
 
 
-
-
-
-
-
-
-
-
-
-
-if __name__ == '__main__': 
-
-    # Init neuron 
-    neuron = HH()
-
-    # Select time of iteraction 
-    time = 100      # ms 
-    dt   = 0.01      # ms
-
-    # Select time of stimulation 
-    steps = math.ceil(time / dt)
-    I = np.zeros(steps)
-    I[1*math.ceil(steps / 4):3*math.ceil(steps / 4)] = 10
-
-    # Run 
-    v = neuron.stimulation(time, I, dt)
-
-    # Plot
-    vTime = np.arange(0, time, dt, dtype=float)
-    plt.plot(vTime, v, color='r')
-    plt.plot(vTime, I, color='b')
-    plt.title('Hodgkin Huxel Model')
-    plt.xlabel("Time [ms]")
-    plt.ylabel("Voltage [mV]")
-    plt.show() 

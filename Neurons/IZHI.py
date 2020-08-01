@@ -38,7 +38,7 @@ class Izhi():
         if method != 1 and method != 0:
             print("Invalid method\n0 - EULER\n1 - RK4\n")
 
-        if self.v >= -30:
+        if self.v >= 30:
             self.v = self.c
             self.u += self.d
         else: 
@@ -48,8 +48,8 @@ class Izhi():
                 self.solve_euler(dt, I)
 
     def solve_euler(self,dt,I): 
-        dv = self.f_v(I,v,dt) 
-        du = self.f_u(u,dt) 
+        dv = self.f_v(I,self.v,dt) 
+        du = self.f_u(self.u,dt) 
         self.v += dv
         self.u += du
 
