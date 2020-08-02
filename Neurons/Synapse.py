@@ -104,48 +104,49 @@ class LIF:
         self.ps_sum = 0
         for ti in self.pre_neuron.spikes.time_spikes:
             delta_t = t - ti
-            self.ps_sum += Pmax * t / tau_s * np.exp(1 - delta_t / tau_s)         # apply ps formula for each spike
+            self.ps_sum += Pmax * delta_t / tau_s * np.exp(1 - delta_t / tau_s)         # apply ps formula for each spike
 
 
 
 if __name__ == '__main__':
 
 #   INIBITORIO -------------------
-    # n1 = LIF(False)
-    # n2 = LIF(False)
+    n1 = LIF(False)
+    n2 = LIF(False)
 
-    # neurons = [n1, n2]
-    # n1.pre_neuron = neurons[1]
-    # n2.pre_neuron = neurons[0]
+    neurons = [n1, n2]
+    n1.pre_neuron = neurons[1]
+    n2.pre_neuron = neurons[0]
 
-    # n1.v = El
-    # n2.v = -54
+    n1.v = El
+    n2.v = -54
 
-    # v1 = np.zeros(steps)
-    # v2 = np.zeros(steps)
+    v1 = np.zeros(steps)
+    v2 = np.zeros(steps)
 
-    # # RUN
-    # for i in range(1, steps):
-    #     for j,neuron in enumerate(neurons):
-    #         neuron.step(i, i*dt)
-    #         if j == 0: 
-    #             v1[i] = neuron.v 
-    #             v2[i] = neuron.v 
+    # RUN
+    for i in range(1, steps):
+        for j,neuron in enumerate(neurons):
+            neuron.step(i, i*dt)
+            if j == 0: 
+                v1[i] = neuron.v 
+            if j == 1: 
+                v2[i] = neuron.v 
             
 
-    # # PLOT RESULTS
-    # begin = 3800
-    # begin_step = math.ceil(begin/dt)
-    # time = np.arange(begin, T, dt)
+    # PLOT RESULTS
+    begin = 3800
+    begin_step = math.ceil(begin/dt)
+    time = np.arange(begin, T, dt)
 
 
-    # plt.title("Inhibitory neurons")
-    # plt.plot(time, v1[begin_step:], color='b', label="neuron 1")
-    # plt.plot(time, v2[begin_step:], color='r', label="neuron 2")
-    # plt.legend(loc="upper left")
-    # plt.xlabel("t (ms)")
-    # plt.ylabel("V (mV)")
-    # plt.show()
+    plt.title("Inhibitory neurons")
+    plt.plot(time, v1[begin_step:], color='b', label="neuron 1")
+    plt.plot(time, v2[begin_step:], color='r', label="neuron 2")
+    plt.legend(loc="upper left")
+    plt.xlabel("t (ms)")
+    plt.ylabel("V (mV)")
+    plt.show()
 
 #   EXCITATORIO -------------------------------
     n1 = LIF()
