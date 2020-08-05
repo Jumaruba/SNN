@@ -1,173 +1,42 @@
 
-import math
-import numpy as np
-import matplotlib.pyplot as plt
 
-global tau_m, El, rm_gs, Rm_Ie, Es, V_trhs, dt, T, Pmax
-tau_m = 20                      # [ms] How fast all the action happens
-tau_s = 10                      # [ms] Peak lag from the beginning of the curve
-El = -70                        # [mV] Initial voltage
-rm_gs = 0.05                    # [mA] Resistence * Synapse conductance
-Rm_Ie = 25                      # [mV] Resistence * Externa current
-V_trhs = -54                    # [mV] Threshold voltage
-dt = 0.05                       # [ms] Step time
-T = 4000                        # [mS] total time of analyses
-Pmax = 1                        # Max value the Ps can reach
-V_reset = -80                   # [mV] Reset voltage
+class LIF():
+    def __init__(self):
+        self.R = 5  
+        self.C = 3
+        self.uR = -40
+        self.thrs = 30
+        self.maxV = 90
+        self.v = -65
 
-steps = math.ceil(T/dt)
+    def step(self, I, dt, method=0): 
+        
+        if self.v >= self.thrs:
+            self.v = self.uR
+        else: 
+            if method == 1: 
+                self.solve_rk4(dt, I)
+            elif method == 0: 
+                self.solve_euler(dt, I)
 
-'''A class to keep track of the spikes transmited by a synapse 
-Parameters
--------
-time_spikes: float array
-Array responsible for store the time the neuron had a spike  
-len_time_spikes: int
-Size of the time array. Yeah, I could do len(time), but for python it costs O(n) (which is too much) 
-max_len: int
-Max number of neurons to be considered at the calculation of Ps_num 
-'''
-class Spikes:
+            if self.v >= self.thrs: 
+                self.v = self.maxV 
 
-    def __init__(self, max_len=20):
-        self.time_spikes = []
-        self.len_time_spike = 0
-        self.max_len = max_len
+    def solve_euler(self, I, dt):        
+        dv = self.fu(self.v, I) * dt 
+        self.v += dv 
 
-    def add_spike(self, current_time):
-        if self.len_time_spike == self.max_len:
-            self.time_spikes.pop(0)
-            self.len_time_spike -= 1
-
-        self.time_spikes.append(current_time)
-        self.len_time_spike += 1
-
-    def get_last_spike(self):
-        if self.len_time_spike-1 < 0: return None
-        return self.time_spikes[self.len_time_spike-1]
-
-
-'''LIF neuron with synapse implemented 
-Parameters
--------
-In: boolean 
-	True if the neuron is inhibitory and False if it's excitatory 
-dt: float
-	Delta time 
-T: float 
-	Total time to be analysed 
-'''
-
-
-class LIF:
-    def __init__(self, Exc=True):
-
-        self.Es = 0 if Exc else -80
-
-        self.v = np.zeros(steps)                    # Voltage historic so as to plot results
-        self.actualTime = dt
-        self.pre_neuron = None                      # Pre-synaptic neurons connected to it
-
-        max_spikes_anal = 100                       # Max spikes to be considered by the algorithm to calculate Ps
-        self.spikes = Spikes(max_spikes_anal)
-
-        self.ps_sum = 0
-
-    def step(self, i):
-        self.actualTime += dt
-
-        self.Ps()
-
-        if self.ps_sum > Pmax:
-            self.ps_sum = Pmax
-
-        if self.v[i - 1] > V_trhs:
-            self.v[i - 1] = 0  # setting last voltage to spike value
-            self.v[i] = V_reset
-        else:
-            self.rk4(i)
-
-        if self.v[i] >= V_trhs:
-            self.spikes.add_spike(self.actualTime)
-
-
-    def euler(self, i):
-        dv = self.fv(self.v[i - 1])* dt
-        self.v[i] = dv + self.v[i - 1]
-
-    def rk4(self, i):
-        dv1 = self.fv(self.v[i - 1]) * dt
-        dv2 = self.fv(self.v[i - 1] + dv1 * 0.5) * dt
-        dv3 = self.fv(self.v[i - 1] + dv2 * 0.5) * dt
-        dv4 = self.fv(self.v[i - 1] + dv3) * dt
+    def solve_rk4(self, I, dt):
+        dv1 = self.fu(self.v, I) * dt
+        dv2 = self.fu(self.v + dv1 * 0.5, I) * dt
+        dv3 = self.fu(self.v + dv2 * 0.5, I) * dt
+        dv4 = self.fu(self.v + dv3, I) * dt
         dv = 1 / 6 * (dv1 + dv2 * 2 + dv3 * 2 + dv4)
-        self.v[i] = self.v[i - 1] + dv
+        self.v +=dv 
 
-    def fv(self, v):
-        return (El - v - self.ps_sum * rm_gs * (v - self.Es) + Rm_Ie) / tau_m
 
-    def Ps(self):
-        self.ps_sum = 0
-        last_spike = self.spikes.get_last_spike()
-        for ti in self.pre_neuron.spikes.time_spikes:
-            if last_spike:
-                t = last_spike - ti
-                self.ps_sum += Pmax * t / tau_s * np.exp(1 - t / tau_s)         # apply ps formula for each spike
+    def fu(self, v, I):
+        return (-v + self.R * I) / (self.R * self.C)
 
 
 
-if __name__ == '__main__':
-
-#   INIBITORIO -------------------
-    n1 = LIF(False)
-    n2 = LIF(False)
-
-    neurons = [n1, n2]
-    n1.pre_neuron = neurons[1]
-    n2.pre_neuron = neurons[0]
-
-    n1.v[0] = El
-    n2.v[0] = -54
-
-    # RUN
-    for i in range(1, steps):
-        for neuron in neurons:
-            neuron.step(i)
-
-    # PLOT RESULTS
-    begin = 3800
-    begin_step = math.ceil(begin/dt)
-    time = np.arange(begin, T, dt)
-
-
-    plt.title("Inhibitory neurons")
-    plt.plot(time, n1.v[begin_step:], color='b', label="neuron 1")
-    plt.plot(time, n2.v[begin_step:], color='r', label="neuron 2")
-    plt.legend(loc="upper left")
-    plt.xlabel("t (ms)")
-    plt.ylabel("V (mV)")
-    plt.show()
-
-#   EXCITATORIO -------------------------------
-    n1 = LIF()
-    n2 = LIF()
-
-    neurons = [n1, n2]
-    n1.pre_neuron = neurons[1]
-    n2.pre_neuron = neurons[0]
-
-    n1.v[0] = El
-    n2.v[0] = -54
-
-    # RUN
-    for i in range(1, steps):
-        for neuron in neurons:
-            neuron.step(i)
-
-    plt.title("Excitatory neurons")
-    plt.plot(time, n1.v[begin_step:], color='b', label="neuron 1")
-    plt.plot(time, n2.v[begin_step:], color='r', label="neuron 2")
-    plt.xlabel("t (ms)")
-    plt.ylabel("V (mV)")
-    plt.legend(loc="upper left")
-    plt.show()
