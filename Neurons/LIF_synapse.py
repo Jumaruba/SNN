@@ -101,6 +101,8 @@ class LIF:
     def fv(self, v, I):
         return  (El - v - self.ps_sum * rm_gs * (v - self.Es) + Rm * I) / tau_m
 
+    # When a actiona potential invades the presynaptic terminal the probability of the gates open is increased
+    # So, the ps depends on the actions potentials of the pre-neurons 
     def ps_alpha(self):
         self.ps_sum = 0
         for neuron in self.pre_neuron:
