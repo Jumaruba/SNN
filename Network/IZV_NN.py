@@ -1,9 +1,7 @@
-import sys
-import os
 import numpy as np
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Neurons"))
-from Izhikevich import Izhi
+from __init__ import *
+from IZHI import IZHI as Izhi
 import random as rand
 import math as m
 import matplotlib.pyplot as plt
@@ -25,14 +23,18 @@ class Network:
 
     def randomize_neurons(self):
         for i in range(self.numNeurons):
-            temp = rand.uniform(0, 1)  # random constant
-            if i < self.Ne:
-                self.neurons[i].set_constants(0.02, 0.2, -0.65 + 15 * temp ** 2, 8 - 6 * temp ** 2)
-            else:
-                self.neurons[i].set_constants(0.02 + 0.08 * temp, 0.25 - 0.05 * temp, -65, 2)
+            temp = rand.uniform(0, 1)   # random constant
 
-            self.neurons[i].V = -65
-            self.neurons[i].U = self.neurons[i].V * self.neurons[i].b
+            if i < self.Ne:
+                self.neurons[i].a = 0.02
+                self.neurons[i].b = 0.2
+                self.neurons[i].c = -65 + 15 * temp ** 2
+                self.neurons[i].d = 8 - 6 * temp ** 2
+            else:
+                self.neurons[i].a = 0.02 + 0.08 * temp
+                self.neurons[i].b = 0.25 - 0.05 * temp
+                self.neurons[i].c = -65
+                self.neurons[i].d = 2
 
     def generate_weights(self):
         self.weights = np.random.rand(self.numNeurons, self.numNeurons)
@@ -42,11 +44,11 @@ class Network:
     def fire(self):
         time = 1000
         dt = 0.5
-        fire_time = []  # all occurrences of firing (neuron, time)
+
         firings = []
         for t in range(time):
             I = np.concatenate((np.random.normal(1, 1, self.Ni) * 5, np.random.normal(1, 1, self.Ne) * 2), axis=0)
-            fired = [i for i in range(self.Ne + self.Ni) if self.neurons[i].V >= 30]
+            fired = [i for i in range(self.Ne + self.Ni) if self.neurons[i].v >= 30]
             len_fired = len(fired)
             len_firings = len(firings)
 
@@ -60,25 +62,27 @@ class Network:
 
             # update U and V to the fired ones
             for k in range(len(fired)):
-                self.neurons[fired[k]].nextIteration(0.5, I[fired[k]])
+                for i in range(m.ceil(1/dt)):
+                    self.neurons[fired[k]].step(dt, I[fired[k]], 1)
 
             # update I
             I = I + np.sum(self.weights[:, fired], axis=1)
 
             for k in range(self.numNeurons):
-                self.neurons[k].nextIteration(dt, I[k])
+                for i in range(m.ceil(1/dt)):
+                    self.neurons[k].step(dt, I[k], 1)
 
         return firings 
 
 
-
+n = Network(1000)
 firings = n.fire()
 
-x = [firings[i][0] for i in range(len(firings))]  # neurons
-y = [firings[i][1] for i in range(len(firings))]  # time
+y = [firings[i][0] for i in range(len(firings))]  # neurons
+x = [firings[i][1] for i in range(len(firings))]  # time
 
 plt.title("Spikes in a SNN")
-plt.xlabel("Neurons")
-plt.ylabel("Time [ms]")
-plt.scatter(x, y, s=0.05, color='black')
+plt.ylabel("Neurons")
+plt.xlabel("Time [ms]")
+plt.scatter(x, y, s=0.1, color='black')
 plt.show()

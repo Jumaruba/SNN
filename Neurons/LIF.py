@@ -32,7 +32,7 @@ class LIF():
         dv3 = self.fu(self.v + dv2 * 0.5, I) * dt
         dv4 = self.fu(self.v + dv3, I) * dt
         dv = 1 / 6 * (dv1 + dv2 * 2 + dv3 * 2 + dv4)
-        self.v +=dv 
+        self.v += dv
 
 
     def fu(self, v, I):

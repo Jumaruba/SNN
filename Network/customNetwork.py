@@ -41,9 +41,9 @@ class CustomNetwork:
         self.Ni = Ni
         self.time = time
         self.dt = dt
-        self.firings = [] 
+        self.firings = []
         if I: self.I = np.array(I)
-        else: 
+        else:
             self.I = np.concatenate((np.random.normal(1, 1, self.Ni) * 5, np.random.normal(1, 1, self.Ne) * 2), axis=0)
 
         if weights: self.weights = np.array(weights)
@@ -63,30 +63,17 @@ class CustomNetwork:
 
             if i < self.Ne:
                 self.neurons[i].a = 0.02
-                self.neurons[i].b = 0.2 
+                self.neurons[i].b = 0.2
                 self.neurons[i].c = -0.65 + 15 * temp ** 2
                 self.neurons[i].d = 8 - 6 * temp ** 2
             else:
                 self.neurons[i].a = 0.02 + 0.08 *temp
-                self.neurons[i].b =  0.25 - 0.05 * temp
-                self.neurons[i].c = -65 
+                self.neurons[i].b = 0.25 - 0.05 * temp
+                self.neurons[i].c = -65
                 self.neurons[i].d = 2
 
             self.neurons[i].v = -65
             self.neurons[i].u = self.neurons[i].v * self.neurons[i].b
-    
-    def set_neurons(self, a, b, c, d, V=-65, U=None, neuronNumber = None):
-        if neuronNumber: 
-            self.neurons[neuronNumber].set_constants(a,b,c,d) 
-            self.neurons[neuronNumber].v = V
-            if U: self.neurons[neuronNumber].u = U
-            else: self.neurons[neuronNumber].u = self.neurons[neuronNumber].v * self.neurons[neuronNumber].b
-        else: 
-            for i in range(self.Ni + self.Ne): 
-                self.neurons[i].set_constants(a,b,c,d)
-                self.neurons[i].v = V 
-                if U: self.neurons[i].u = U
-                else: self.neurons[i].u = self.neurons[i].v * self.neurons[i].b 
 
 
     def generate_weights(self):
