@@ -37,9 +37,37 @@ class LIF:
         self.last_spike = None                      # Time of the last spike 
         self.ps_sum = 0
         self.current_time = 0
+
+    '''Next iteration for the neuron 
+
+    Parameters
+    -------
+    dt: float
+        Variation of the time 
+    I: float
+        Current 
+    method: 0 or 1 
+        if 0 euler method will be used 
+        if 1 rk4 method will be used 
+    ps: 0 or 1 
+        This is type of curve for the pd parameter
+        0 for the k curve 
+        1 for the alpha curve
+
+    '''
     def step(self, dt = 0.05, I = 0,  method=0):
+
+        if method != 0 and method != 1: 
+            print("Invalid value for method-\nMust be 0 or 1") 
+            return 
+        elif ps != 0 and ps != 1: 
+            print("Invalid value for ps.\nMust be 0 or 1")
+
+
         self.current_time += dt 
-        self.Ps()
+
+        self.ps_alpha()
+
 
         if self.ps_sum > Pmax: 
             self.ps_sum = Pmax
@@ -73,11 +101,10 @@ class LIF:
     def fv(self, v, I):
         return  (El - v - self.ps_sum * rm_gs * (v - self.Es) + Rm * I) / tau_m
 
-    def Ps(self):
+    def ps_alpha(self):
         self.ps_sum = 0
-        for neuron in self.pre_neuron: 
-            if neuron.last_spike: 
-                delta_t = self.last_spike - neuron.last_spike
+        for neuron in self.pre_neuron:
+            if neuron.last_spike:
+                delta_t = self.current_time - neuron.last_spike
                 self.ps_sum += Pmax * delta_t / tau_s * np.exp(1 - delta_t / tau_s)         # apply ps formula for each spike
-
 

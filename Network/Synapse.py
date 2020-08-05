@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 dt = 0.05
 T = 4000
 steps = math.ceil(T/dt)
+I = 10
 
 #   INIBITORIO -------------------
 n1 = LIF(False)
@@ -24,7 +25,7 @@ v2 = np.zeros(steps)
 # RUN
 for i in range(1, steps):
     for j,neuron in enumerate(neurons):
-        neuron.step(i, i*dt)
+        neuron.step(dt, I)
         if j == 0: 
             v1[i] = neuron.v 
         if j == 1: 
@@ -59,10 +60,13 @@ n2.v = -54
 v3 = np.zeros(steps)
 v4 = np.zeros(steps)
 
+v3[0] = n1.v
+v4[0] = n2.v
+
 # RUN
 for i in range(1, steps):
     for j,neuron in enumerate(neurons):
-        neuron.step(i, i*dt)
+        neuron.step(dt, I)
         if j == 0: 
             v3[i] = neuron.v 
         if j == 1: 
