@@ -1,8 +1,17 @@
 # SNN
 Repository with several implementations of neural network models. 
 
+## Neurons implemented 
+Variation of voltage can be obtained with [Runge Kutta Fourth Method](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods) or [Euler Method](https://en.wikipedia.org/wiki/Euler_method).  
 
-## Eugene M. Izhikevich 
+|Neuron |  Implementation |Tests |Results | 
+|---|---|---|---|
+|Hodking Huxley|[HH.py](Neurons/HH.py) | [HH-test.py](Neurons/test/HH-test.py) | [HH](Neurons/test/expected-results/HH/)  |   
+|Izhikevich |  [IZHI.py](Neurons/IZHI.py) | [IZHI-test.py](Neurons/test/IZHI-test.py) | [IZHI](Neurons/test/expected-results/IZHI/) | 
+|Leaky Integrate and Fire |  [LIF.py](Neurons/LIF.py)  | [LIF-test.py](Neurons/test/LIF-test.py )|[LIF](Neurons/test/expected-results/LIF) |
+|Leaky Integrate and Fire - Synapses |  [LIF_Synapse.py](Neurons/LIF_synapse.py)  | [LIF_Synapse-test.py](Neurons/test/LIF_synapse-test.py) |[LIF_SYN](Neurons/test/expected-results/LIF_SYN/) |
+
+## Demonstration of result - Izhikevich Neuron 
 The code for this model was developed using the [paper](https://www.izhikevich.org/publications/spikes.pdf) written by Izhikevich with the constant variables described at the document. This is the [Code](Neurons/Izhikevich.py) for a single neuron. The threshold used was -30 mV. 
  
 The parameter used to generate these graphs were:         
@@ -19,30 +28,10 @@ This graph shows the fast and regular spiking with constant `a = 0.1`
 This graph show the slow and regular spiking with constant `a = 0.02`
 ![](https://i.imgur.com/0QSoXWK.png)
 
-
-
-
-## Hodgkin Huxel 
-
-The code for this model was developed using the [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1392413/pdf/jphysiol01442-0106.pdf) and also equations and constants from [this pdf](http://www.math.pitt.edu/~bdoiron/assets/ermentrout-and-terman-ch-1.pdf).  
-This is a [code](Neurons/HH.py) for a single neuron.  
-
-![](https://i.imgur.com/GKcwAQL.png)
-
-## LIF
-
-The code for this model was developed using this [website](https://neuronaldynamics.epfl.ch/online/Ch1.S3.html), with constants choosed by us.
-
-This is a [code](Neurons/Ric_LIF.py) for a single neuron.
-
-![](https://i.imgur.com/vh4uGSQ.png)
-
-## Spikes in a simple neural network model 
-Following the code in the [Izhikevich Paper](https://www.izhikevich.org/publications/spikes.pdf) for a simple and random SNN, we can have the following map of spikes: 
-
-![](https://i.imgur.com/bx4Mb9Z.png)
-
-The first 750 neurons are the excitatory ones and the other 250 are the inhibitory ones. 
+# Izhikevich Random Network 
+[Code](https://github.com/Jumaruba/SNN/blob/master/Network/IZV_NN.py)   
+[Paper](https://www.izhikevich.org/publications/spikes.pdf)  
+![](https://i.imgur.com/bYqNj2L.png)
 
 ## References: 
 
