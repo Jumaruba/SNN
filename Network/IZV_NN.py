@@ -47,7 +47,7 @@ class Network:
 
         firings = []
         for t in range(time):
-            I = np.concatenate((np.random.normal(1, 1, self.Ni) * 5, np.random.normal(1, 1, self.Ne) * 2), axis=0)
+            I = np.concatenate((np.random.normal(1, 1, self.Ne) * 5, np.random.normal(1, 1, self.Ni) * 2), axis=0)
             fired = [i for i in range(self.Ne + self.Ni) if self.neurons[i].v >= 30]
             len_fired = len(fired)
             len_firings = len(firings)
@@ -66,7 +66,7 @@ class Network:
                     self.neurons[fired[k]].step(dt, I[fired[k]], 1)
 
             # update I
-            I = I + np.sum(self.weights[:, fired], axis=1)
+            I += np.sum(self.weights[:, fired], axis=1)
 
             for k in range(self.numNeurons):
                 for i in range(m.ceil(1/dt)):
