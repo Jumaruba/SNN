@@ -1,5 +1,6 @@
 # SNN
-Repository with several implementations of neural network models. 
+Repository with several implementations of neural network models.  
+It's still in development.  
 
 ## Neurons implemented 
 Variation of voltage can be obtained with [Runge Kutta Fourth Method](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods) or [Euler Method](https://en.wikipedia.org/wiki/Euler_method).  
