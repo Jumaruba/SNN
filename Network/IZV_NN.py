@@ -6,9 +6,13 @@ import random as rand
 import math as m
 import matplotlib.pyplot as plt
 
-'''
-@def Simple network for neurons with one layer of neurons explained at izhikevich paper 
-@param numNeurons: number of neurons 
+'''Simple network for neurons with one layer from network explained at izhikevich paper
+Izhikevich paper: https://www.izhikevich.org/publications/spikes.pdf 
+
+Parameters 
+-------
+numNeurons: 
+    Number of neurons 
 '''
 
 class Network:
@@ -73,6 +77,7 @@ class Network:
                     self.neurons[k].step(dt, I[k], 1)
 
         return firings 
+
 
 
 n = Network(1000)

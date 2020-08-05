@@ -1,10 +1,12 @@
+import numpy as np
 
+''' Hodkin Huxley Neuron 
 
-# constants http://www.math.pitt.edu/~bdoiron/assets/ermentrout-and-terman-ch-1.pdf
-# paper https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1392413/pdf/jphysiol01442-0106.pdf
+constants http://www.math.pitt.edu/~bdoiron/assets/ermentrout-and-terman-ch-1.pdf
+paper https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1392413/pdf/jphysiol01442-0106.pdf
+'''
 
-
-class HH():
+class HH:
     #Constans 
 
     Cm      =   1.0         # uF/cm^2 
@@ -31,9 +33,9 @@ class HH():
         gCond  = self.gl 
 
         # Current 
-        INa = NaCond*(self.v-self.VNa) 
-        IK  = KCond *(self.v-self.VK)
-        Il  = gCond *(self.v-self.Vl)
+        INa = NaCond * (self.v-self.VNa)
+        IK  = KCond  * (self.v-self.VK)
+        Il  = gCond  * (self.v-self.Vl)
 
         if method == 0: 
             self.solve_euler(dt, I, INa, IK, Il)
@@ -42,7 +44,7 @@ class HH():
 
     # EULER --------------------------
 
-    def solve_euler(self,dt,I, INa, IK, Il):
+    def solve_euler(self, dt, I, INa, IK, Il):
         dv = (I - INa - IK - Il)*dt/self.Cm 
         self.v += dv
 
@@ -70,7 +72,7 @@ class HH():
         
         return dv 
 
-    def getDn(self, I, dt): 
+    def getDn(self, dt):
         dn1 = (self.alpha_n(self.v)*(1-self.n)-self.beta_n(self.v)*self.n)*dt
         dn2 = (self.alpha_n(self.v)*(1-(self.n + dn1*0.5))-self.beta_n(self.v)*(self.n+dn1*0.5))*dt
         dn3 = (self.alpha_n(self.v)*(1-(self.n + dn2*0.5))-self.beta_n(self.v)*(self.n+dn2*0.5))*dt
@@ -79,7 +81,7 @@ class HH():
         
         return dn 
 
-    def getDm(self, I, dt):
+    def getDm(self, dt):
         dm1 = (self.alpha_m(self.v)*(1-self.m)-self.beta_m(self.v)*self.m)*dt
         dm2 = (self.alpha_m(self.v)*(1-(self.m + dm1*0.5))-self.beta_m(self.v)*(self.m + dm1*0.5))*dt
         dm3 = (self.alpha_m(self.v)*(1-(self.m + dm2*0.5))-self.beta_m(self.v)*(self.m + dm2*0.5))*dt
@@ -88,7 +90,7 @@ class HH():
 
         return dm 
 
-    def getDh(self, I, dt):
+    def getDh(self, dt):
         dh1 = (self.alpha_h(self.v)*(1-self.h)-self.beta_h(self.v)*self.h)*dt
         dh2 = (self.alpha_h(self.v)*(1-(self.h + dh1*0.5))-self.beta_h(self.v)*(self.h + dh1*0.5))*dt
         dh3 = (self.alpha_h(self.v)*(1-(self.h + dh2*0.5))-self.beta_h(self.v)*(self.h + dh2*0.5))*dt

@@ -18,7 +18,13 @@ Rm = 2.5                        # [mOhm] Membrane resistence
 
 
 
-'''LIF neuron with synapse implemented 
+'''Leaky Integrate and Fire neuron with synapse implemented
+
+Source: 
+    Theoretical Neuroscience - Computational and Mathematical Modeling of Neural Systems 
+    By Laurence F. Abbott and Peter Dayan 
+    Page: 188 
+    
 Parameters
 -------
 Exc: boolean 
@@ -101,7 +107,7 @@ class LIF:
     def fv(self, v, I):
         return  (El - v - self.ps_sum * rm_gs * (v - self.Es) + Rm * I) / tau_m
 
-    # When a actiona potential invades the presynaptic terminal the probability of the gates open is increased
+    # When an action potential invades the presynaptic terminal the probability of the gates open is increased
     # So, the ps depends on the actions potentials of the pre-neurons 
     def ps_alpha(self):
         self.ps_sum = 0

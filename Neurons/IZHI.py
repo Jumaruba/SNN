@@ -1,10 +1,10 @@
 
-'''Izhikevich neuron 
 
-font: https://www.izhikevich.org/publications/spikes.pdf 
+'''Izhikevich neuron
+
+paper: https://www.izhikevich.org/publications/spikes.pdf
 '''
-
-class IZHI():
+class IZHI:
     def __init__(self):
         self.a = .1            
         self.b = .2

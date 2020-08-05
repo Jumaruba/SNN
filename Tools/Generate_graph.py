@@ -1,4 +1,4 @@
-from __init__ import *
+
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -12,7 +12,7 @@ def generate_weights(Ne, Ni):
     return weights
 
 
-''' Method responsible for drawing the structure of the network 
+''' Method responsible for drawing the structure of the network as a graph 
 
 Parameters 
 -------
@@ -74,6 +74,6 @@ def drawGraph(Ne, Ni, weights=None, edgeLabel=True):
 
 # Example of usage
 if __name__ == '__main__':
-    Ne = 7
+    Ne = 3
     Ni = 3
     drawGraph(Ne, Ni, generate_weights(Ne, Ni))

@@ -1,6 +1,10 @@
 
 
-class LIF():
+'''Leaky Integrate and Fire neuron
+
+source: https://neuronaldynamics.epfl.ch/online/Ch1.S3.html
+'''
+class LIF:
     def __init__(self):
         self.R = 5  
         self.C = 3
