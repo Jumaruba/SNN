@@ -28,9 +28,8 @@ This graph shows the fast and regular spiking with constant `a = 0.1`
 This graph show the slow and regular spiking with constant `a = 0.02`
 ![](https://i.imgur.com/0QSoXWK.png)
 
-# Izhikevich Random Network 
-[Code](https://github.com/Jumaruba/SNN/blob/master/Network/IZV_NN.py)   
-[Paper](https://www.izhikevich.org/publications/spikes.pdf)  
+## [Izhikevich Random Network](https://github.com/Jumaruba/SNN/blob/master/Network/IZV_NN.py)   
+This is a random network taken from the [Izhikevich Paper](https://www.izhikevich.org/publications/spikes.pdf) with no learning and 750 Excitatory and 250 Inhibitory neurons. The results are just as expected.    
 ![](https://i.imgur.com/bYqNj2L.png)
 
 ## References: 
@@ -39,6 +38,6 @@ http://worldcomp-proceedings.com/proc/p2013/BIC3207.pdf
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1392413/pdf/jphysiol01442-0106.pdf  
 http://www.math.mcgill.ca/gantumur/docs/reps/RyanSicilianoHH.pdf    
 http://www.math.pitt.edu/~bdoiron/assets/ermentrout-and-terman-ch-1.pdf
-https://neuronaldynamics.epfl.ch/online/Ch1.S3.html
-[Izhikevich Paper](https://www.izhikevich.org/publications/spikes.pdf)  
+https://neuronaldynamics.epfl.ch/online/Ch1.S3.html  
+[Izhikevich Paper](https://www.izhikevich.org/publications/spikes.pdf)    
 [Hodgkin Huxel Paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1392413/pdf/jphysiol01442-0106.pdf)   
