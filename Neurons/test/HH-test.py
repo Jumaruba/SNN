@@ -1,4 +1,5 @@
 from __init__ import * 
+    from HH import HH
 from plot import plot
 
 '''Test EULER METHOD

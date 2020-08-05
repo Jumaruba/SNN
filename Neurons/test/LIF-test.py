@@ -1,4 +1,5 @@
-from __init__ import * 
+from __init__ import *
+from LIF import *  
 from plot import plot
 
 '''Test EULER METHOD
@@ -24,7 +25,7 @@ I = [0 if 200/dt <= i <= 300/dt  else 10 for i in range(steps)]
 # Comment the test you do not wish to do 
 
 # TEST : EULER
-plot(neuron, time, dt, I, 0)
+#plot(neuron, time, dt, I, 0)
 
 #TEST : RK4
-# plot(neuron, time, dt, I, 1)
+plot(neuron, time, dt, I, 1)
